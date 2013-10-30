@@ -34,7 +34,8 @@ vocabulary PacmanVoc{
 
 theory PacmanTheory:PacmanVoc{
 	// Wall predicaat symmetrisch maken
-	! x[xCo],y[yCo],d[dir] : 
+	! y1[yCo],y2[yCo] : Wall(x,y1,Down) & y2=-1+y1 => Wall(x,y2,Up).
+	! y1[yCo],y2[yCo] : Wall(x,y1,Up) & y2=1+y1 => Wall(x,y2,Down).
 	
 	// Alle vakjes zijn aaneengesloten
 	
