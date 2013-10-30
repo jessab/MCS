@@ -74,9 +74,6 @@ theory PacmanTheory:PacmanVoc{
 	// Niemand beweegt door muren
 	! x[xCo],y[yCo],a[agent],d[dir]:(Wall(x,y,d)&Position(a,x,y)=>~Move(a,d)).
 	
-	// Je kan niet in de richting van een niet bestaand vakje bewegen
-	
-	
 	// Iedereen kan hoogstens in 1 richting tegelijk bewegen
 	! a[agent] : ! d1[dir],d2[dir] : ( Move(a,d1) & Move(a,d2) ) => d1=d2.
 	
