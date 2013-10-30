@@ -69,14 +69,14 @@ theory PacmanTheory:PacmanVoc{
 	}
 	
 	// GameLost en GameWon hebben de juiste interpretatie in functie v d andere predicaten
-	~ (? x[xCo],y[yCo] : Gold(x,y)) <=> GameWon.
+	~GameLost & ~ (? x[xCo],y[yCo] : Gold(x,y)) <=> GameWon.
 	(? x[xCo],y[yCo], a[agent]: Position(pacman,x,y) & Position(a,x,y) & ~a=pacman)<=>GameLost.
 	
 	// Iedereen is op exact 1 plaats
 	!x1[xCo],x2[xCo],y1[yCo],y2[yCo],a[agent]:((Position(a,x1,y1)&Position(a,x2,y2))=>(x1=x2&y1=y2)).
 	
 	// Niemand staat op plaatsen waar geen vakje is
-	!x[xCo],y[yCo]:(Position(_,x,y)=>~NoPos(x,y)).
+	!a[agent],x[xCo],y[yCo]:(Position(a,x,y)=>~NoPos(x,y)).
 	
 	// Er kan enkel goud liggen op plaatsen waar een vakje is
 	! x[xCo],y[yCo] : Gold(x,y) => ~NoPos(x,y).
@@ -98,10 +98,10 @@ theory PacmanTheory:PacmanVoc{
 															=> ~Gold(x1,y1).
 
 	// Afhankelijk van of het spel al gedaan is moet iedereen bewegen/mag niemand bewegen
-	GameEnded<=>~(?a[agent]:Move(a,_)).
+	GameEnded<=>~(?d[dir],a[agent]:Move(a,d)).
 	
 	// Niemand beweegt van het bord af
-	!a[agent],x[xCo],y[yCo],d[dir]:Position(a,x,y)&Move(a,d)&Transition(d,x,y,x2,y2)=>Pos(x2,y2).
+	!a[agent],x1[xCo],y1[yCo],x2[xCo],y2[yCo],d[dir]:Position(a,x1,y1)&Move(a,d)&Transition(d,x1,y1,x2,y2)=>Pos(x2,y2).
 }
 
 
