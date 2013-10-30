@@ -28,7 +28,7 @@ vocabulary PacmanVoc{
 	//Eigen predicaten
 	Reach(xCo,yCo,xCo,yCo)
 	ReachInStep(xCo,yCo,xCo,yCo)
-
+	OppositeDir(dir,dir)
 	
 
 }
@@ -43,8 +43,11 @@ theory PacmanTheory:PacmanVoc{
 	// Alle vakjes zijn aaneengesloten
 	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ReachInStep(x1,y1,x2,y2) <=> ( (x1=x2+1 & ~Wall(x1,y1,Right))
 																		| (y1=y2+1 & ~Wall(x1,y1,Up)) ).
-	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ReachInStep(x1,y1,x2,y2) <=> ReachInStep(x2,y2,x1,y1). 
-	
+	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ReachInStep(x1,y1,x2,y2) <=> ReachInStep(x2,y2,x1,y1).
+	{
+		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ReachInStep(x1,y1,x2,y2).
+		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ? x3[xCo], y3[yCo] : Reach(x1,y1,x3,y3) & Reach(x3,y3,x2,y2).
+	}
 	
 	// GameLost en GameWon hebben de juiste interpretatie in functie v d andere predicaten
 	~ (? x[xCo],y[yCo] : Gold(x,y)) <=> GameWon.
@@ -55,10 +58,16 @@ theory PacmanTheory:PacmanVoc{
 	// Niemand staat op plaatsen waar geen vakje is
 	
 	// Er kan enkel goud liggen op plaatsen waar een vakje is
-	
+	! x[xCo],y[yCo] : Gold(x,y) => ~NoPos(x,y).
 	// Niemand beweegt door muren
 	
 	// Iedereen kan hoogstens in 1 richting tegelijk bewegen
+	
+	// Ghosts kunnen niet omkeren
+	OppositeDir(Right,Left).
+	OppositeDir(Up,Down).
+	! d1[dir],d2[dir] : OppositeDir(d1,d2) <=> OppositeDir(d2,d1).
+	! a [agent] : ! d [dir] : ! prevD [dir] : ( Move(a,d) & PreviousMove(a,prevD) ) => ~OppositeDir(d,prevD).
 	
 		
 }
