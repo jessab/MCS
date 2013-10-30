@@ -78,6 +78,7 @@ theory PacmanTheory:PacmanVoc{
 	
 	
 	// Iedereen kan hoogstens in 1 richting tegelijk bewegen
+	! a[agent] : ! d1[dir],d2[dir] : ( Move(a,d1) & Move(a,d2) ) => d1=d2.
 	
 	// Ghosts kunnen niet omkeren
 	OppositeDir(Right,Left).
