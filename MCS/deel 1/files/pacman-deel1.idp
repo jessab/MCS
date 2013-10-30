@@ -54,6 +54,7 @@ theory PacmanTheory:PacmanVoc{
 	(Position(a,x1,y1)&Position(a,x2,y2))=>(x1=x2&y1=y2).
 	
 	// Niemand staat op plaatsen waar geen vakje is
+	Position(a,x,y)=>~NoPos(x,y).
 	
 	// Er kan enkel goud liggen op plaatsen waar een vakje is
 	
