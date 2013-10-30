@@ -42,8 +42,10 @@ theory PacmanTheory:PacmanVoc{
 						& Transition(Up,x,y,x,y+1) & Transition(Down,x,y,x,-1+y).
 						
 	// OpositeDirection, uitdrukken dat twee richtingen elkaars tegengestellenden zijn
-	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ! d1[dir],d2[dir] :
-									OppositeDir(d1,d2) <=> ( Transition(d1,x1,y1,x2,y2) & Transition(d2,x2,y2,x1,y1) ).
+	//! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ! d1[dir],d2[dir] :
+	//								OppositeDir(d1,d2) <=> ( Transition(d1,x1,y1,x2,y2) & Transition(d2,x2,y2,x1,y1) ).
+	! d1[dir],d2[dir] : ? x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ( Transition(d1,x1,y1,x2,y2) & Transition(d2,x2,y2,x1,y1) )
+																=> OppositeDir(d1,d2).
 	
 	// GameEnded: Het spel is gedaan, het is verloren of gewonnen
 	GameEnded<=>(GameLost|GameWon).
