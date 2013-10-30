@@ -35,8 +35,10 @@ vocabulary PacmanVoc{
 
 theory PacmanTheory:PacmanVoc{
 	// Wall predicaat symmetrisch maken
-	! y1[yCo],y2[yCo] : Wall(x,y1,Down) & y2=-1+y1 => Wall(x,y2,Up).
-	! y1[yCo],y2[yCo] : Wall(x,y1,Up) & y2=1+y1 => Wall(x,y2,Down).
+	! y1[yCo],y2[yCo] : Wall(x,y1,Down) & y2=-1+y1 <=> Wall(x,y2,Up).
+	//! y1[yCo],y2[yCo] : Wall(x,y1,Up) & y2=1+y1 => Wall(x,y2,Down).
+	! x1[xCo],x2[xCo] : Wall(x1,y,Right) & x2=-1+x1 <=> Wall(x2,y,Left).
+	//! x1[xCo],x2[xCo] : Wall(x1,y,Left) & x2=1+x1 => Wall(x2,y,Right).
 	
 	// Alle vakjes zijn aaneengesloten
 	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ReachInStep(x1,y1,x2,y2) <=> ( (x1=x2+1 & ~Wall(x1,y1,Right))
@@ -44,7 +46,9 @@ theory PacmanTheory:PacmanVoc{
 	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ReachInStep(x1,y1,x2,y2) <=> ReachInStep(x2,y2,x1,y1). 
 	
 	
-	// Gamlost en Gamedown hebben de juiste interpretatie in functie v d andere predicaten
+	// GameLost en GameWon hebben de juiste interpretatie in functie v d andere predicaten
+	~ (? x[xCo],y[yCo] : Gold(x,y)) <=> GameWon.
+	(? x[xCo],y[yCo], a[agent]: Position(pacman,x,y) & Position(a,x,y) & ~a=pacman)<=>GameLost.
 	
 	// Iedereen is op exact 1 plaats
 	
