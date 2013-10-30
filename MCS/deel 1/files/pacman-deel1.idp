@@ -12,6 +12,7 @@ vocabulary PacmanVoc{
 	type agent //The ghosts and pacman
 	pacman:agent
 
+	Pos(xCo,yCo)
 	NoPos(xCo,yCo) 
 	Wall(xCo,yCo,dir)
 
@@ -20,6 +21,7 @@ vocabulary PacmanVoc{
 	Gold(xCo,yCo)
 	GameLost
 	GameWon
+	GameEnded
 	Position(agent,xCo,yCo)
 	
 	PreviousMove(agent,dir)
@@ -42,6 +44,12 @@ theory PacmanTheory:PacmanVoc{
 	// OpositeDirection, uitdrukken dat twee richtingen elkaars tegengestellenden zijn
 	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ! d1[dir],d2[dir] :
 									OppositeDir(d1,d2) <=> ( Transition(d1,x1,y1,x2,y2) & Transition(d2,x2,y2,x1,y1) ).
+	
+	// GameEnded: Het spel is gedaan, het is verloren of gewonnen
+	GameEnded<=>(GameLost|GameWon).
+	
+	// Pos: Een positie waar wel een vakje is
+	!x[xCo],y[yCo]:Pos(x,y)<=>~NoPos(x,y).
 	
 	// Wall predicaat symmetrisch maken
 	//! y1[yCo],y2[yCo] : Wall(x,y1,Down) & y2=-1+y1 <=> Wall(x,y2,Up).
@@ -89,6 +97,12 @@ theory PacmanTheory:PacmanVoc{
 	// Pacman laat geen goud liggen.
 	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ! d[dir] : ( PreviousMove(pacman,d) & Transition(d,x1,y1,x2,y2) & Position(pacman,x2,y2) ) 
 															=> ~Gold(x1,y1).
+
+	// Afhankelijk van of het spel al gedaan is moet iedereen bewegen/mag niemand bewegen
+	GameEnded<=>~(?a[agent]:Move(a,_)).
+	
+	// Niemand beweegt van het bord af
+	!a[agent],x[xCo],y[yCo],d[dir]:Position(a,x,y)&Move(a,d)&Transition(d,x,y,x2,y2)=>Pos(x2,y2).
 }
 
 
