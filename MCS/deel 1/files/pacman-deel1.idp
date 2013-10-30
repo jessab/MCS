@@ -61,8 +61,9 @@ theory PacmanTheory:PacmanVoc{
 	
 	// Er kan enkel goud liggen op plaatsen waar een vakje is
 	! x[xCo],y[yCo] : Gold(x,y) => ~NoPos(x,y).
-	// Niemand beweegt door muren
 	
+	// Niemand beweegt door muren
+	! x[xCo],y[yCo],a[agent],d[dir]:(Wall(x,y,d)&Position(a,x,y)=>~Move(a,d)).
 	
 	// Iedereen kan hoogstens in 1 richting tegelijk bewegen
 	! a[agent] : ! d1[dir],d2[dir] : ( Move(a,d1) & Move(a,d2) ) => d1=d2.
