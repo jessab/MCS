@@ -29,6 +29,7 @@ vocabulary PacmanVoc{
 
 	//Eigen predicaten
 	Reach(xCo,yCo,xCo,yCo)
+	ReachInStep(xCo,yCo,xCo,yCo)
 	OppositeDir(dir,dir)
 	Transition(dir,xCo,yCo,xCo,yCo)
 	
@@ -40,9 +41,9 @@ theory PacmanTheory:PacmanVoc{
 	! x[xCo] : ! y[yCo] : Transition(Right,x,y,x+1,y) & Transition(Left,x,y,(-1+x),y)
 						& Transition(Up,x,y,x,y+1) & Transition(Down,x,y,x,-1+y).
 						
-	// OpositeDirection, uitdrukken dat twee richtingen elkaars tegengestelden zijn
-	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ! d1[dir],d2[dir] : ( Transition(d1,x1,y1,x2,y2) & Transition(d2,x2,y2,x1,y1) )
-																=> OppositeDir(d1,d2).
+	// OpositeDirection, uitdrukken dat twee richtingen elkaars tegengestellenden zijn
+	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ! d1[dir],d2[dir] :
+									OppositeDir(d1,d2) <=> ( Transition(d1,x1,y1,x2,y2) & Transition(d2,x2,y2,x1,y1) ).
 	
 	// GameEnded: Het spel is gedaan, het is verloren of gewonnen
 	GameEnded<=>(GameLost|GameWon).

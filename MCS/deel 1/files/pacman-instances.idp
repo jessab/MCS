@@ -15,6 +15,9 @@ procedure check() {
 		{lose, "lose", 1 } ,
 	}
 
+
+	//stdoptions.liftedunitpropagation=false
+	//stdoptions.groundwithbounds=false
 	
 	
 	for i = 1, #strucs do
@@ -25,6 +28,7 @@ procedure check() {
 		stdoptions.nbmodels = expected + 1
 		print("Veryfing", name)
 		local models = modelexpand(PacmanTheory,curr[1])
+		//printcore(PacmanTheory,curr[1])
 		local modelsfound = #models
 		if modelsfound > expected then
 			print(">>>>>>> Verification failed. Found too many models for", name)
