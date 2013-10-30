@@ -1,0 +1,56 @@
+vocabulary PacmanVoc{
+
+	type dir //We guarantee you that dir, Left, Right, Up, Down will always be correctly interpreted in structures. You should not check this.
+	Down: dir
+	Left: dir
+	Right: dir
+	Up: dir
+
+	type xCo isa int
+	type yCo isa int
+
+	type agent //The ghosts and pacman
+	pacman:agent
+
+	NoPos(xCo,yCo) 
+	Wall(xCo,yCo,dir)
+
+
+	/*Van wat hieronder staat kan een deel gegeven zijn, een deel gevraagd*/
+	Gold(xCo,yCo)
+	GameLost
+	GameWon
+	Position(agent,xCo,yCo)
+	
+	PreviousMove(agent,dir)
+	Move(agent,dir)
+
+	
+
+
+	
+
+}
+
+theory PacmanTheory:PacmanVoc{
+	// Wall predicaat symmetrisch maken
+	! x[xCo],y[yCo],d[dir] : 
+	
+	// Alle vakjes zijn aaneengesloten
+	
+	// Gamlost en Gamedown hebben de juiste interpretatie in functie v d andere predicaten
+	
+	// Iedereen is op exact 1 plaats
+	
+	// Niemand staat op plaatsen waar geen vakje is
+	
+	// Er kan enkel goud liggen op plaatsen waar een vakje is
+	
+	// Niemand beweegt door muren
+	
+	// Iedereen kan hoogstens in 1 richting tegelijk bewegen
+	
+		
+}
+
+
