@@ -25,8 +25,9 @@ vocabulary PacmanVoc{
 	PreviousMove(agent,dir)
 	Move(agent,dir)
 
-	
-
+	//Eigen predicaten
+	Reach(xCo,yCo,xCo,yCo)
+	ReachInStep(xCo,yCo,xCo,yCo)
 
 	
 
@@ -38,6 +39,10 @@ theory PacmanTheory:PacmanVoc{
 	! y1[yCo],y2[yCo] : Wall(x,y1,Up) & y2=1+y1 => Wall(x,y2,Down).
 	
 	// Alle vakjes zijn aaneengesloten
+	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ReachInStep(x1,y1,x2,y2) <=> ( (x1=x2+1 & ~Wall(x1,y1,Right))
+																		| (y1=y2+1 & ~Wall(x1,y1,Up)) ).
+	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ReachInStep(x1,y1,x2,y2) <=> ReachInStep(x2,y2,x1,y1). 
+	
 	
 	// Gamlost en Gamedown hebben de juiste interpretatie in functie v d andere predicaten
 	
