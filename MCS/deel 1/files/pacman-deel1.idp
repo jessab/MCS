@@ -72,6 +72,7 @@ theory PacmanTheory:PacmanVoc{
 																		& ~Wall(x1,y1,d) & Pos(x1,y1) & Pos(x2,y2) ).
 		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ? x3[xCo], y3[yCo] : Reach(x1,y1,x3,y3) & Reach(x3,y3,x2,y2).
 	}
+	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ( Pos(x1,y1) & Pos(x2,y2) ) => Reach(x1,y1,x2,y2).
 	
 	// GameLost en GameWon hebben de juiste interpretatie in functie v d andere predicaten
 	~GameLost & ~ (? x[xCo],y[yCo] : Gold(x,y)) <=> GameWon.
