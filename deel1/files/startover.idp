@@ -45,23 +45,23 @@ theory PacmanTheory:PacmanVoc{
 	// Transition, de relatie tussen verandering van coordinaten en richting.
 	// Impliciet, wanneer er een transition bestaat, liggen twee vakjes naast elkaar.
 	{
-	!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Down ,x1,y1,x2,y2) <- x2=x1 & y2=-1+y1.
-	!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Up   ,x1,y1,x2,y2) <- x2=x1 & y2= 1+y1.
-	!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Left ,x1,y1,x2,y2) <- x2=-1+x1 & y2=y1.
-	!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Right,x1,y1,x2,y2) <- x2= 1+x1 & y2=y1.
+		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Down ,x1,y1,x2,y2) <- x2=x1 & y2=-1+y1.
+		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Up   ,x1,y1,x2,y2) <- x2=x1 & y2= 1+y1.
+		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Left ,x1,y1,x2,y2) <- x2=-1+x1 & y2=y1.
+		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Right,x1,y1,x2,y2) <- x2= 1+x1 & y2=y1.
 	}
 							
 	// OpositeDirection, uitdrukken dat twee richtingen elkaars tegengestellenden zijn
-		OppositeDir(Left)=Right.
-		OppositeDir(Up)=Down.
-		!d[dir]:OppositeDir(OppositeDir(d))=d.
+	OppositeDir(Left)=Right.
+	OppositeDir(Up)=Down.
+	!d[dir]:OppositeDir(OppositeDir(d))=d.
 		
 	// GameEnded: Het spel is gedaan, het is verloren of gewonnen
 	GameEnded<=>GameLost|GameWon.
 	
 	// Pos: Een positie waar wel een vakje is
 	{
-	!x[xCo],y[yCo]:Pos(x,y)<-~NoPos(x,y).
+		!x[xCo],y[yCo]:Pos(x,y)<-~NoPos(x,y).
 	}
 	
 	// Wall predicaat symmetrisch maken
@@ -706,14 +706,14 @@ structure moveTroughWall: PacmanVoc {
 
 procedure check() {
 	local strucs={
-//		{split, "split", 0 } ,
-//		{invalidGold, "invalidGold", 0}, 
-//		{cheater2, "cheater2", 0 } ,
-//		{cheater3, "cheater3", 0 } ,
+		{split, "split", 0 } ,
+		{invalidGold, "invalidGold", 0}, 
+		{cheater2, "cheater2", 0 } ,
+		{cheater3, "cheater3", 0 } ,
 		{huge, "huge", 2},
-//		{winlose, "winlose", 0 } ,
-//		{win, "win", 1 } ,
-//		{lose, "lose", 1 } ,
+		{winlose, "winlose", 0 } ,
+		{win, "win", 1 } ,
+		{lose, "lose", 1 } ,
 	}
 
 
