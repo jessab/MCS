@@ -100,6 +100,7 @@ theory PacmanTheory:PacmanVoc{
 	
 	// Iedereen kan hoogstens in 1 richting tegelijk bewegen
 	! a[agent] : ! d1[dir],d2[dir] : ( Move(a,d1) & Move(a,d2) ) => d1=d2.
+	! a[agent] : ! d1[dir],d2[dir] : ( PreviousMove(a,d1) & PreviousMove(a,d2) ) => d1=d2. /*in dynamisch systeem is dit geimpliceerd */
 	
 	// Ghosts kunnen niet omkeren
 	! a[agent],d [dir], prevD[dir] : a=pacman | ( Move(a,d) & PreviousMove(a,prevD)=>~prevD=OppositeDir(d)).
@@ -110,9 +111,10 @@ theory PacmanTheory:PacmanVoc{
 
 	// Afhankelijk van of het spel al gedaan is moet iedereen bewegen/mag niemand bewegen
 	GameEnded<=>~?a[agent],d[dir]:Move(a,d).
+	~GameEnded<=>!a[agent]:?d[dir]:Move(a,d).
 	
 	// Niemand beweegt van het bord af
-	!a[agent],x1[xCo],y1[yCo],x2[xCo],y2[yCo],d[dir]:Position(a,x1,y1)&Move(a,d)&Transition(d,x1,y1,x2,y2)=>Pos(x2,y2).
+	!a[agent],x1[xCo],y1[yCo],d[dir]:Position(a,x1,y1)&Move(a,d)=>?x2[xCo],y2[yCo]:Transition(d,x1,y1,x2,y2)&Pos(x2,y2).
 }
 
 
@@ -125,22 +127,593 @@ Some instance for the time-independent Pacman game.
 */
 include <mx>
 
-procedure main() {
+
+procedure eigenTests() {
+	local strucs = {
+		{"turning ghost",turnGhost},
+		{"OneMoveDirection",oneMoveDir} ,
+		{"allPos",allPos} ,
+		{"mini",mini} ,
+		//specifieke tests
+		{"win",winSituation,},
+		{"lose", lostSituation},
+		{"winlose", winLostSituation},
+		{"findPositionsNormal", findPositionsNormal},
+		{"findPositionsWin", findPositionsWin},
+		{"findPositionsLose", findPositionsLose},
+		{"goldNoPos",goldNoPos1},
+		{"moveTroughWall",moveTroughWall},
+		{"moveMultipleDirections",moveMultipleDirections},
+		{"ghostTurnBack",ghostTurnBack},
+		{"pacmanTurnBack",pacmanTurnBack},
+		{"pacmanLeavesGold", pacmanLeavesGold},
+		{"gameEndedMove", gameEndedMove},
+		{"gameNotEndedNoMove",gameNotEndedNoMove},
+		{"moveToNoPos",moveToNoPos},
+		{"moveOutsideDomain",moveOutsideDomain},
+		{"noGoldLeft",noGoldLeft},
+		{"goldNoPos",goldNoPos},
+	}
+	
+	
+//	printcore(PacmanTheory,strucs[1][2])
+	
+	for i=1, #strucs do
+	print("executing ", strucs[i][1])
+	local models = modelexpand(PacmanTheory, strucs[i][2])
+	//printcore(PacmanTheory,strucs[i][2])
+	printmodels(models)
+	end
+	
+}
+
+
+
+
+
+structure noGoldLeft : PacmanVoc{
+	//unsatisfiable
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; }
+	PreviousMove={p,u;Blinky,u;}
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position<ct> = {p,2,3}
+
+	Wall = {2,2,d}
+	
+	Gold={2,2}
+}
+
+structure goldNoPos: PacmanVoc{
+	//unsatisfiable
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; }
+	PreviousMove={p,u;Blinky,u;}
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position<ct> = {p,2,3}
+
+	Wall = {2,2,d}
+	
+	Gold={1,2}
+}
+
+
+structure turnGhost : PacmanVoc{
+	// unsatisfiable
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; Pinky; Inky; Clyde}
+	PreviousMove={p,d;Blinky,d;Pinky,d;Inky,d;Clyde,d}
+	Move={Pinky,u}
+
+	NoPos = {}
+
+	Wall = {2,2,r}
+
+}
+
+
+structure oneMoveDir : PacmanVoc{
+	// pinky should not move up
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p;Pinky}
+	PreviousMove ={Pinky,d}
+
+
+	NoPos = {}
+
+	Wall = {2,2,r}
+
+}
+
+
+structure allPos : PacmanVoc{
+	//all positions should be reachable
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; Pinky; Inky; Clyde}
+	PreviousMove={p,d;Blinky,d;Pinky,d;Inky,d;Clyde,d}
+
+	NoPos = {}
+
+	Wall = {2,2,r}
+
+}
+
+
+structure mini : PacmanVoc{
+	// all positions should be reachable 
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..3}
+	yCo = {1}
+
+	pacman=p
+	agent={p; Blinky; Pinky; Inky; Clyde}
+	PreviousMove={p,d;Blinky,d;Pinky,d;Inky,d;Clyde,d}
+
+	NoPos = {}
+
+	Wall = {1,1,l}
+
+}
+
+
+
+
+structure moveOutsideDomain: PacmanVoc {
+	//unsatisfiable
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..3}
+	yCo = {1..3}
+
+	pacman=p
+	agent={p; g}
+	
+	Position={p,2,2;g,3,2}
+	
+	Move = {p,u;g,r}
+	PreviousMove = {p,d;g,r}
+
+}
+
+
+structure moveToNoPos: PacmanVoc {
+	//unsatisfiable
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..3}
+	yCo = {1..3}
+
+	pacman=p
+	agent={p; g}
+	
+	Position={p,2,2;g,3,2}
+	
+	Move = {p,u;g,d}
+	PreviousMove = {p,d;g,r}
+
+	NoPos={3,1}
+}
+
+structure gameNotEndedNoMove: PacmanVoc {
+	//unsatisfiable
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..3}
+	yCo = {1..3}
+
+	pacman=p
+	agent={p; g}
+	
+	Position={p,2,2;g,3,2}
+	
+	Move = {p,u}
+	PreviousMove = {p,d;g,r}
+
+	GameEnded = false
+}
+
+
+structure gameEndedMove: PacmanVoc {
+	//unsatisfiable
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..3}
+	yCo = {1..3}
+
+	pacman=p
+	agent={p; g}
+	
+	Position={p,2,2;g,3,2}
+	
+	Move = {p,u}
+	PreviousMove = {p,d;g,r}
+
+	GameEnded = true
+}
+
+structure pacmanLeavesGold: PacmanVoc {
+	//unsatisfiable
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..3}
+	yCo = {1..3}
+
+	pacman=p
+	agent={p; g}
+	
+	Position={p,2,2;g,3,2}
+	
+	Move = {p,u;g,d}
+	PreviousMove = {p,d;g,r}
+
+	Gold={2,3}
+}
+
+
+structure pacmanTurnBack: PacmanVoc {
+	//satisfiable
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..3}
+	yCo = {1..3}
+
+	pacman=p
+	agent={p; g}
+	
+	Position={p,2,2;g,3,2}
+	
+	Move = {p,u;g,d}
+	PreviousMove = {p,d;g,r}
+
+}
+
+structure ghostTurnBack: PacmanVoc {
+	//unsatisfiable
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..3}
+	yCo = {1..3}
+
+	pacman=p
+	agent={p; g}
+	
+	Position={p,2,2;g,3,2}
+	
+	Move = {p,u;g,d}
+	PreviousMove = {p,r;g,u}
+
+}
+
+structure moveMultipleDirections: PacmanVoc {
+	//unsatisfiable
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..3}
+	yCo = {1..3}
+
+	pacman=p
+	agent={p; }
+	
+	Position={p,2,2}
+	
+	Move = {p,u;p,d}
+
+	
+	GameEnded=false
+
+}
+
+structure winSituation: PacmanVoc {
+	// goal: GameWon = true
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky;}
+	PreviousMove={p,d;Blinky,d;}
+	Position={p,2,2;Blinky,3,3}
+
+	NoPos = {1,1;1,2;1,3;1,4;2,1;2,4;3,1;3,2;4,1;4,2;4,3;4,4}
+	
+	Gold = {}
+
+	Wall = {2,2,r}
+}
+
+structure lostSituation: PacmanVoc {
+	// goal: GameLost = true
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky;}
+	PreviousMove={p,d;Blinky,d;}
+	Position={p,2,2;Blinky,2,2}
+
+	NoPos = {1,1;1,2;1,3;1,4;2,1;2,4;3,1;3,4;4,1;4,2;4,3;4,4}
+	
+	Gold = {3,3}
+
+	Wall = {2,2,r}
+}
+
+structure winLostSituation: PacmanVoc {
+	// goal: GameLost = true
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky;}
+	PreviousMove={p,d;Blinky,d;}
+	Position={p,2,2;Blinky,2,2}
+
+	NoPos = {1,1;1,2;1,3;1,4;2,1;2,4;3,1;3,2;4,1;4,2;4,3;4,4}
+	
+	Gold = {}
+
+	Wall = {2,2,r}
+}
+
+structure findPositionsNormal: PacmanVoc {
+	// find positions
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky;}
+
+	NoPos = {1,1;1,2;1,3;1,4;2,1;2,4;3,1;4,1;4,2;4,3;4,4}
+	
+	GameEnded=false
+	
+	Gold = {2,2;3,3}
+
+	Wall = {2,2,r}
+	
+}
+
+
+structure findPositionsWin: PacmanVoc {
+	//find positions in such a way that the game is won:
+	//No gold is present anymore
+	//pacman and blinky are not in the same position
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky;}
+
+	NoPos = {1,1;1,2;1,3;1,4;2,1;2,4;3,1;3,2;4,1;4,2;4,3;4,4}
+	
+	GameWon=true
+
+	Wall = {2,2,r}
+}
+
+
+structure findPositionsLose: PacmanVoc {
+	//find positions in such a way that the game is won:
+	//presence of gold is not important
+	//pacman and blinky are in the same position
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky;}
+
+	NoPos = {1,1;1,2;1,3;1,4;2,1;2,4;3,1;3,2;4,1;4,2;4,3;4,4}
+	
+//	Gold = {2,2;3,2}
+	
+	GameLost=true
+
+	Wall = {2,2,r}
+}
+
+
+
+structure goldNoPos1: PacmanVoc {
+	// should be unsatisfiable
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky;}
+
+	NoPos = {1,1;1,2;1,3;1,4;2,1;2,4;3,1;4,1;4,2;4,3;4,4}
+	
+	GameEnded=false
+	
+	Gold = {2,2;3,3;4,4}
+
+	Wall = {2,2,r}
+	
+}
+
+
+
+
+structure moveTroughWall: PacmanVoc {
+	//if move is commented: result is Move{p,d}
+	//else unsatisfiable
+	
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..3}
+	yCo = {1..3}
+
+	pacman=p
+	agent={p; }
+	
+	Position={p,2,2}
+	
+	//Move = {p,u}
+
+	
+	GameEnded=false
+
+	Wall = {2,2,r;2,2,l;2,2,u}
+	
+}
+
+
+
+
+procedure check() {
 	local strucs={
-//		{turnGhost, "turning ghost",0},
-//		{oneMoveDir, "OneMoveDirection",2} ,
-//		{allPos, "allPos", 3 } ,
-//		{mini, "mini", 2 } ,
-		{split, "split", 0 } ,
-		{invalidGold, "invalidGold", 0}, 
-		{cheater2, "cheater2", 0 } ,
-		{cheater3, "cheater3", 0 } ,
-//		{huge, "huge", 2},
-		{winlose, "winlose", 0 } ,
-		{win, "win", 1 } ,
-		{lose, "lose", 1 } ,
-		{noGoldLeft,"noGoldLeft",0},
-		{goldNoPos,"goldNoPos",0},
+//		{split, "split", 0 } ,
+//		{invalidGold, "invalidGold", 0}, 
+//		{cheater2, "cheater2", 0 } ,
+//		{cheater3, "cheater3", 0 } ,
+		{huge, "huge", 2},
+//		{winlose, "winlose", 0 } ,
+//		{win, "win", 1 } ,
+//		{lose, "lose", 1 } ,
 	}
 
 
@@ -171,92 +744,6 @@ procedure main() {
 	
 	
 
-
-}
-
-
-structure turnGhost : PacmanVoc{
-	dir = {u;d;l;r}
-	Up=u
-	Down=d
-	Left=l
-	Right=r
-
-	xCo = {1..4}
-	yCo = {1..4}
-
-	pacman=p
-	agent={p; Blinky; Pinky; Inky; Clyde}
-	PreviousMove={p,d;Blinky,d;Pinky,d;Inky,d;Clyde,d}
-	Move={Pinky,u}
-
-	NoPos = {}
-
-	Wall = {2,2,r}
-
-}
-
-
-structure oneMoveDir : PacmanVoc{
-	dir = {u;d;l;r}
-	Up=u
-	Down=d
-	Left=l
-	Right=r
-
-	xCo = {1..4}
-	yCo = {1..4}
-
-	pacman=p
-	agent={p;Pinky}
-	PreviousMove ={Pinky,d}
-
-
-	NoPos = {}
-
-	Wall = {2,2,r}
-
-}
-
-
-structure allPos : PacmanVoc{
-	dir = {u;d;l;r}
-	Up=u
-	Down=d
-	Left=l
-	Right=r
-
-	xCo = {1..4}
-	yCo = {1..4}
-
-	pacman=p
-	agent={p; Blinky; Pinky; Inky; Clyde}
-	PreviousMove={p,d;Blinky,d;Pinky,d;Inky,d;Clyde,d}
-
-	NoPos = {}
-
-	Wall = {2,2,r}
-
-}
-
-
-structure mini : PacmanVoc{
-	dir = {u;d;l;r}
-	Up=u
-	Down=d
-	Left=l
-	Right=r
-
-	xCo = {1..3}
-	yCo = {1}
-
-	pacman=p
-	agent={p; Blinky; Pinky; Inky; Clyde}
-	PreviousMove={p,d;Blinky,d;Pinky,d;Inky,d;Clyde,d}
-
-	NoPos = {}
-
-	Wall = {1,1,l}
 
 }
 
@@ -467,49 +954,5 @@ structure lose : PacmanVoc{
 	Gold={}
 
 	
-}
-
-structure noGoldLeft : PacmanVoc{
-	dir = {u;d;l;r}
-	Up=u
-	Down=d
-	Left=l
-	Right=r
-
-	xCo = {1..4}
-	yCo = {1..4}
-
-	pacman=p
-	agent={p; Blinky; }
-	PreviousMove={p,u;Blinky,u;}
-
-	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
-	Position<ct> = {p,2,3}
-
-	Wall = {2,2,d}
-	
-	Gold={2,2}
-}
-
-structure goldNoPos: PacmanVoc{
-	dir = {u;d;l;r}
-	Up=u
-	Down=d
-	Left=l
-	Right=r
-
-	xCo = {1..4}
-	yCo = {1..4}
-
-	pacman=p
-	agent={p; Blinky; }
-	PreviousMove={p,u;Blinky,u;}
-
-	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
-	Position<ct> = {p,2,3}
-
-	Wall = {2,2,d}
-	
-	Gold={1,2}
 }
  
