@@ -49,6 +49,8 @@ theory PacmanTheory:PacmanVoc{
 	OppositeDir(Left)=Right.
 	OppositeDir(Up)=Down.
 	!d[dir]:OppositeDir(OppositeDir(d))=d.
+	//! x1[xCo],y1[yCo],x2[xCo],y2[yCo]: ! d[dir]: Transition(d,x1,y1,x2,y2)
+	//									<=> Transition(OppositeDir(d),x2,y2,x1,y1).
 		
 	// GameEnded: Het spel is gedaan, het is verloren of gewonnen
 	GameEnded<=>GameLost|GameWon.
