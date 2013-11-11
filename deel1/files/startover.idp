@@ -45,7 +45,7 @@ theory PacmanTheory:PacmanVoc{
 		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Right,x1,y1,x2,y2) <- x2= 1+x1 & y2=y1.
 	}
 							
-	// OpositeDirection, uitdrukken dat twee richtingen elkaars tegengestelden zijn
+	// OppositeDirection, uitdrukken dat twee richtingen elkaars tegengestelden zijn
 	OppositeDir(Left)=Right.
 	OppositeDir(Up)=Down.
 	!d[dir]:OppositeDir(OppositeDir(d))=d.
@@ -68,23 +68,24 @@ theory PacmanTheory:PacmanVoc{
 	
 
 	// Alle vakjes zijn aaneengesloten
+		//Reach: 2 vakjes kunnen elkaar bereiken via aaneenliggende vakjes die deel 
+		//       zijn van het spel (Pos) en waar geen muur tussen staat.
 	{
 		! x[xCo],y[yCo] : Reach(x,y,x,y) <-Pos(x,y).
 		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ? d[dir] :Transition(d,x1,y1,x2,y2) 
 																		& ~IsWall(x1,y1,d) & Pos(x1,y1) & Pos(x2,y2).
 		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ?x3[xCo],y3[yCo]:Reach(x1,y1,x3,y3)&Reach(x3,y3,x2,y2).
 	}
+		// Alle vakjes die deel zijn van het spel (Pos) kunnen elkaar bereiken
 	!x1[xCo],y1[yCo],x2[xCo],y2[yCo]:Pos(x1,y1)&Pos(x2,y2)<=>Reach(x1,y1,x2,y2).
 	
 	// GameLost en GameWon hebben de juiste interpretatie in functie v d andere predicaten
-	~GameLost & ~ (? x[xCo],y[yCo] : Gold(x,y)) <=> GameWon.
+	~GameLost & ~ (? x[xCo],y[yCo] : Gold(x,y)) <=> GameWon. //Als aan de voorwaarden voor gameLost én gameWon voldaan is, dan is het ook verloren
 	(? x[xCo],y[yCo], a[agent]: Position(pacman,x,y) & Position(a,x,y) & ~a=pacman)<=>GameLost.
 	
 	// Iedereen is op exact 1 plaats
-	!a[agent]:?x[xCo],y[yCo]:Position(a,x,y).
-	!a[agent],x1[xCo],y1[yCo],x2[xCo],y2[yCo]:Position(a,x1,y1)&Position(a,x2,y2)
-			=> x1=x2&y1=y2.
-	
+	!a[agent]:#{x[xCo] y[yCo] : Position(a,x,y)}=1.
+				
 	// Niemand staat op plaatsen waar geen vakje is
 	!a[agent],x[xCo],y[yCo]:Position(a,x,y)=>Pos(x,y).
 	
@@ -95,8 +96,8 @@ theory PacmanTheory:PacmanVoc{
 	! x[xCo],y[yCo],a[agent],d[dir]:(IsWall(x,y,d)&Position(a,x,y)=>~Move(a,d)).
 	
 	// Iedereen kan hoogstens in 1 richting tegelijk bewegen
-	! a[agent] : ! d1[dir],d2[dir] : ( Move(a,d1) & Move(a,d2) ) => d1=d2.
-	! a[agent] : ! d1[dir],d2[dir] : ( PreviousMove(a,d1) & PreviousMove(a,d2) ) => d1=d2. /*in dynamisch systeem is dit geimpliceerd */
+	!a[agent]:#{d[dir] : Move(a,d)} < 2.
+	!a[agent]:#{d[dir] : PreviousMove(a,d)} < 2. /*in dynamisch systeem is dit geimpliceerd */
 	
 	// Ghosts kunnen niet omkeren
 	! a[agent],d [dir], prevD[dir] : a=pacman | ( Move(a,d) & PreviousMove(a,prevD)=>~prevD=OppositeDir(d)).
@@ -715,15 +716,15 @@ procedure check() {
 		{invalidGold, "invalidGold", 0}, 
 		{cheater2, "cheater2", 0 } ,
 		{cheater3, "cheater3", 0 } ,
-		{huge, "huge", 2},
+		//{huge, "huge", 2},
 		{winlose, "winlose", 0 } ,
 		{win, "win", 1 } ,
 		{lose, "lose", 1 } ,
 	}
 
 
-	stdoptions.liftedunitpropagation=false
-	stdoptions.groundwithbounds=false
+	/*stdoptions.liftedunitpropagation=false
+	stdoptions.groundwithbounds=false*/
 	
 	
 	for i = 1, #strucs do
@@ -733,10 +734,10 @@ procedure check() {
 		local expected = curr[3]
 		stdoptions.nbmodels = expected + 1
 		print("Veryfing", name)
-		//local models = modelexpand(PacmanTheory,curr[1])
-		printcore(PacmanTheory,curr[1])
+		local models = modelexpand(PacmanTheory,curr[1])
+		//printcore(PacmanTheory,curr[1])
 		local modelsfound = #models
-		/*if modelsfound > expected then
+		if modelsfound > expected then
 			print(">>>>>>> Verification failed. Found too many models for", name)
 			printmodels(models)
 		elseif modelsfound < expected then
@@ -744,7 +745,7 @@ procedure check() {
 			printmodels(models)
 		else
 			print("Verification succeeded for", name)
-		end*/
+		end
 	end
 	
 	
