@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2013.11.11)  11 NOV 2013 10:38
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2013.11.11)  11 NOV 2013 12:10
 entering extended mode
 **C:/Users/jessa/Documents/Burgie/Master/Master2/Semester1/MCS/project/MCS/deel
 1/Verslag/VerslagDeel1.tex
@@ -636,24 +636,24 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
 {C:/Users/jessa/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 69.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 78.
  [2]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 69.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 78.
 
 (C:\Users\jessa\Documents\Burgie\Master\Master2\Semester1\MCS\project\MCS\deel1
 \Verslag\VerslagDeel1.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 69.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 69.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 78.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 78.
 Package rerunfilecheck Info: File `VerslagDeel1.out' has not changed.
-(rerunfilecheck)             Checksum: BDD25C3CB1C33DFC37C4D5DB432809C6;196.
+(rerunfilecheck)             Checksum: FBCEAB97BCDDEA40B60BE46922D982B9;255.
 Package logreq Info: Writing requests to 'VerslagDeel1.run.xml'.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 69.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 78.
  ) 
 Here is how much of TeX's memory you used:
- 12246 strings out of 493921
- 189274 string characters out of 3147281
+ 12249 strings out of 493921
+ 189302 string characters out of 3147281
  387419 words of memory out of 3000000
- 15376 multiletter control sequences out of 15000+200000
+ 15378 multiletter control sequences out of 15000+200000
  12096 words of font info for 47 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
  37i,6n,39p,1005b,1392s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -661,9 +661,9 @@ Here is how much of TeX's memory you used:
 ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Program Fi
 les/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTe
 X 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb>
-Output written on VerslagDeel1.pdf (2 pages, 61110 bytes).
+Output written on VerslagDeel1.pdf (2 pages, 62262 bytes).
 PDF statistics:
- 55 PDF objects out of 1000 (max. 8388607)
- 12 named destinations out of 1000 (max. 500000)
- 33 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 60 PDF objects out of 1000 (max. 8388607)
+ 13 named destinations out of 1000 (max. 500000)
+ 41 words of extra memory for PDF output out of 10000 (max. 10000000)
 
