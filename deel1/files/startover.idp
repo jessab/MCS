@@ -1,8 +1,3 @@
-/**
- * Title: A new IDP source file
- * Author: jessa
- */
-
 
 vocabulary PacmanVoc{
 
@@ -31,7 +26,6 @@ vocabulary PacmanVoc{
 	PreviousMove(agent,dir)
 	Move(agent,dir)
 	
-	/* Eigen predicaten */
 	Transition(dir,xCo,yCo,xCo,yCo)
 	OppositeDir(dir):dir
 	IsWall(xCo,yCo,dir)
@@ -45,23 +39,25 @@ theory PacmanTheory:PacmanVoc{
 	// Transition, de relatie tussen verandering van coordinaten en richting.
 	// Impliciet, wanneer er een transition bestaat, liggen twee vakjes naast elkaar.
 	{
-	!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Down ,x1,y1,x2,y2) <- x2=x1 & y2=-1+y1.
-	!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Up   ,x1,y1,x2,y2) <- x2=x1 & y2= 1+y1.
-	!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Left ,x1,y1,x2,y2) <- x2=-1+x1 & y2=y1.
-	!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Right,x1,y1,x2,y2) <- x2= 1+x1 & y2=y1.
+		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Down ,x1,y1,x2,y2) <- x2=x1 & y2=-1+y1.
+		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Up   ,x1,y1,x2,y2) <- x2=x1 & y2= 1+y1.
+		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Left ,x1,y1,x2,y2) <- x2=-1+x1 & y2=y1.
+		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Right,x1,y1,x2,y2) <- x2= 1+x1 & y2=y1.
 	}
 							
-	// OpositeDirection, uitdrukken dat twee richtingen elkaars tegengestellenden zijn
-		OppositeDir(Left)=Right.
-		OppositeDir(Up)=Down.
-		!d[dir]:OppositeDir(OppositeDir(d))=d.
+	// OpositeDirection, uitdrukken dat twee richtingen elkaars tegengestelden zijn
+	OppositeDir(Left)=Right.
+	OppositeDir(Up)=Down.
+	!d[dir]:OppositeDir(OppositeDir(d))=d.
+	//! x1[xCo],y1[yCo],x2[xCo],y2[yCo]: ! d[dir]: Transition(d,x1,y1,x2,y2)
+	//									<=> Transition(OppositeDir(d),x2,y2,x1,y1).
 		
 	// GameEnded: Het spel is gedaan, het is verloren of gewonnen
 	GameEnded<=>GameLost|GameWon.
 	
 	// Pos: Een positie waar wel een vakje is
 	{
-	!x[xCo],y[yCo]:Pos(x,y)<-~NoPos(x,y).
+		!x[xCo],y[yCo]:Pos(x,y)<-~NoPos(x,y).
 	}
 	
 	// Wall predicaat symmetrisch maken
@@ -130,39 +126,46 @@ include <mx>
 
 procedure eigenTests() {
 	local strucs = {
-		{"turning ghost",turnGhost},
-		{"OneMoveDirection",oneMoveDir} ,
-		{"allPos",allPos} ,
-		{"mini",mini} ,
+		{"turning ghost",turnGhost, 0},
+		{"OneMoveDirection",oneMoveDir, '+'} ,
+		{"allPos",allPos, '+'} ,
+		{"mini",mini, '+'} ,
 		//specifieke tests
-		{"win",winSituation,},
-		{"lose", lostSituation},
-		{"winlose", winLostSituation},
-		{"findPositionsNormal", findPositionsNormal},
-		{"findPositionsWin", findPositionsWin},
-		{"findPositionsLose", findPositionsLose},
-		{"goldNoPos",goldNoPos1},
-		{"moveTroughWall",moveTroughWall},
-		{"moveMultipleDirections",moveMultipleDirections},
-		{"ghostTurnBack",ghostTurnBack},
-		{"pacmanTurnBack",pacmanTurnBack},
-		{"pacmanLeavesGold", pacmanLeavesGold},
-		{"gameEndedMove", gameEndedMove},
-		{"gameNotEndedNoMove",gameNotEndedNoMove},
-		{"moveToNoPos",moveToNoPos},
-		{"moveOutsideDomain",moveOutsideDomain},
-		{"noGoldLeft",noGoldLeft},
-		{"goldNoPos",goldNoPos},
+		{"win",winSituation, '+'},
+		{"lose", lostSituation, '+'},
+		{"winlose", winLostSituation, '+'},
+		{"findPositionsNormal", findPositionsNormal, '+'},
+		{"findPositionsWin", findPositionsWin, '+'},
+		{"findPositionsLose", findPositionsLose, '+'},
+		{"goldNoPos",goldNoPos1, 0},
+		{"moveTroughWall",moveTroughWall, 0},
+		{"moveMultipleDirections",moveMultipleDirections, 0},
+		{"ghostTurnBack",ghostTurnBack, 0},
+		{"pacmanTurnBack",pacmanTurnBack, '+'},
+		{"pacmanLeavesGold", pacmanLeavesGold, 0},
+		{"gameEndedMove", gameEndedMove, 0},
+		{"gameNotEndedNoMove",gameNotEndedNoMove, 0},
+		{"moveToNoPos",moveToNoPos, 0},
+		{"moveOutsideDomain",moveOutsideDomain, 0},
+		{"noGoldLeft",noGoldLeft, 0},
+		{"goldNoPos",goldNoPos, 0},
 	}
 	
 	
 //	printcore(PacmanTheory,strucs[1][2])
 	
 	for i=1, #strucs do
-	print("executing ", strucs[i][1])
-	local models = modelexpand(PacmanTheory, strucs[i][2])
-	//printcore(PacmanTheory,strucs[i][2])
-	printmodels(models)
+		print("executing ", strucs[i][1])
+		local models = modelexpand(PacmanTheory, strucs[i][2])
+		//printcore(PacmanTheory,strucs[i][2])
+		if strucs[i][3]=='+'  and 0 < #models then
+			print("Verification succeeded for", strucs[i][1])
+		elseif strucs[i][3]==#models then
+			print("Verification succeeded for", strucs[i][1])
+		else
+			print("Verification failed for", strucs[i][1])
+			printmodels(models)
+		end
 	end
 	
 }
@@ -517,6 +520,8 @@ structure winSituation: PacmanVoc {
 	Gold = {}
 
 	Wall = {2,2,r}
+	
+	GameWon=true
 }
 
 structure lostSituation: PacmanVoc {
@@ -692,7 +697,7 @@ structure moveTroughWall: PacmanVoc {
 	
 	Position={p,2,2}
 	
-	//Move = {p,u}
+	Move = {p,u}
 
 	
 	GameEnded=false
@@ -706,14 +711,14 @@ structure moveTroughWall: PacmanVoc {
 
 procedure check() {
 	local strucs={
-//		{split, "split", 0 } ,
-//		{invalidGold, "invalidGold", 0}, 
-//		{cheater2, "cheater2", 0 } ,
-//		{cheater3, "cheater3", 0 } ,
+		{split, "split", 0 } ,
+		{invalidGold, "invalidGold", 0}, 
+		{cheater2, "cheater2", 0 } ,
+		{cheater3, "cheater3", 0 } ,
 		{huge, "huge", 2},
-//		{winlose, "winlose", 0 } ,
-//		{win, "win", 1 } ,
-//		{lose, "lose", 1 } ,
+		{winlose, "winlose", 0 } ,
+		{win, "win", 1 } ,
+		{lose, "lose", 1 } ,
 	}
 
 
