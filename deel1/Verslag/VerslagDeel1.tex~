@@ -41,7 +41,7 @@ Wanneer kringredeneringen een gevaar vormden werden inductieve definities gebrui
 
 \paragraph{Opposite Direction}
 % Waarom + gevat (1 lijn) of leesbaar
-Het vervatten van het begrip van tegengestelde \newline richtingen laat toe om te abstraheren en predicaten compacter te beschrijven. Omdat elke richting exact \'e\'en tegengestelde heeft, leek de keuze voor een functie vanzelfsprekend. 
+Het vervatten van het begrip van tegengestelde \newline richtingen laat toe om verder te abstraheren en predicaten compacter te beschrijven. Omdat elke richting exact \'e\'e tegengestelde heeft, leek de keuze voor een functie vanzelfsprekend. 
 
 \paragraph{Transition}
 % Waarom + predicaat of functie
@@ -59,7 +59,7 @@ Daarom werd geopteerd om ook een predicaat $Pos$ als tegengestelde van $NoPos$ i
 
 \paragraph{IsWall}
 % Waarom
-$IsWall$ vormt de symmetrische uitbreiding van het gegeven $Wall$ predicaat. Dit werd opnieuw geschreven om de code meer begrijpelijk te maken.
+$IsWall$ vormt de symmetrische uitbreiding van het gegeven $Wall$ predicaat. Dit werd opnieuw geschreven om de code beter begrijpelijk te maken.
 Hier wordt een definitie gebruikt om te voorkomen dat het systeem nieuwe muren cre\"eert waar deze niet bedoeld zijn. Met de voorwaarde dat er een muur in een bepaalde richting op een een vakje staat of in de omgekeerde richting op het grenzend vakje in die richting, werkt een equivalentie uiteraard ook.
 
 \paragraph{Reach}
@@ -69,7 +69,7 @@ Om op te leggen dat alle vakjes toegankelijk zijn vanaf elk ander vakje, werd in
 \section{Tijdsbesteding}
 \begin{tabular}{l l}
 Jessa: & 10u\\
-Karel: & 9u
+Karel: & ?u
 \end{tabular}
 
 \section{Besluit}

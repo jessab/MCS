@@ -126,7 +126,7 @@ theory PacmanTheory:PacmanVoc{
 	// GameLost als een ghost op hetzelfde vakje als pacman staat
 	(? x[xCo],y[yCo], a[agent]: Position(pacman,x,y) & Position(a,x,y) & ~a=pacman)<=>GameLost.
 	// GameWon als al het goud op is en het spel niet verloren is
-	~GameLost & ~ (? x[xCo],y[yCo] : Gold(x,y)) <=> GameWon. //Als aan de voorwaarden voor gameLost én gameWon voldaan is, dan is het ook verloren
+	~GameLost & ~ (? x[xCo],y[yCo] : Gold(x,y)) <=> GameWon. //Als aan de voorwaarden voor gameLost ï¿½n gameWon voldaan is, dan is het ook verloren
 		
 	// GameEnded: Het spel is gedaan, het is verloren of gewonnen
 	GameEnded<=>GameLost|GameWon.
@@ -739,7 +739,7 @@ procedure check() {
 		{invalidGold, "invalidGold", 0}, 
 		{cheater2, "cheater2", 0 } ,
 		{cheater3, "cheater3", 0 } ,
-		//{huge, "huge", 2},
+		{huge, "huge", 2},
 		{winlose, "winlose", 0 } ,
 		{win, "win", 1 } ,
 		{lose, "lose", 1 } ,
