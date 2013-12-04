@@ -1,0 +1,390 @@
+vocabulary PacmanVoc{
+
+	type dir //We guarantee you that dir, Left, Right, Up, Down will always be correctly interpreted in structures. You should not check this.
+	Down: dir
+	Left: dir
+	Right: dir
+	Up: dir
+
+	type xCo isa int
+	type yCo isa int
+
+	type agent //The ghosts and pacman
+	pacman:agent
+
+	NoPos(xCo,yCo) 
+	Wall(xCo,yCo,dir)
+
+
+	/*Van wat hieronder staat kan een deel gegeven zijn, een deel gevraagd*/
+	Gold(xCo,yCo)
+	GameLost
+	GameWon
+	Position(agent,xCo,yCo)
+	
+	PreviousMove(agent,dir)
+	Move(agent,dir)
+
+	//Eigen predicaten
+	Reach(xCo,yCo,xCo,yCo)
+	ReachInStep(xCo,yCo,xCo,yCo)
+	OppositeDir(dir,dir)
+	Transition(dir,xCo,yCo,xCo,xCo)
+	GameEnded
+	Pos(xCo,yCo)
+	CorrectRelation(xCo,yCo,xCo,yCo)
+	
+
+}
+
+theory PacmanTheory:PacmanVoc{
+	// Transition, de relatie tussen verandering van coordinaten en richting.
+	// Impliciet, wanneer er een transition bestaat, liggen twee vakjes naast elkaar.
+//	! x[xCo] : ! y[yCo] : Transition(Right,x,y,x+1,y) & Transition(Left,x,y,(-1+x),y)
+//						& Transition(Up,x,y,x,y+1) & Transition(Down,x,y,x,-1+y).
+
+//	!x1[xCo],y1[yCo],x2[xCo],y2[yCo]:x2=1+x1  & y2=y1 <=> Transition(Right,x1,y1,x2,y2).
+//	!x1[xCo],y1[yCo],x2[xCo],y2[yCo]:x2=-1+x1 & y2=y1 <=> Transition(Left,x1,y1,x2,y2).
+//	!x1[xCo],y1[yCo],x2[xCo],y2[yCo]:x2=x1 & y2=1+y1  <=> Transition(Up,x1,y1,x2,y2).
+//	!x1[xCo],y1[yCo],x2[xCo],y2[yCo]:x2=x1 & y2=-1+y1 <=> Transition(Down,x1,y1,x2,y2).
+
+
+						
+	// OpositeDirection, uitdrukken dat twee richtingen elkaars tegengestellenden zijn
+	//! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ! d1[dir],d2[dir] :
+	//								OppositeDir(d1,d2) <=> ( Transition(d1,x1,y1,x2,y2) & Transition(d2,x2,y2,x1,y1) ).
+//	! d1[dir],d2[dir] : ? x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ( Transition(d1,x1,y1,x2,y2) & Transition(d2,x2,y2,x1,y1) )
+//																=> OppositeDir(d1,d2).
+	
+	// GameEnded: Het spel is gedaan, het is verloren of gewonnen
+//	GameEnded<=>(GameLost|GameWon).
+	
+	// Pos: Een positie waar wel een vakje is
+//	!x[xCo],y[yCo]:Pos(x,y)<=>~NoPos(x,y).
+	
+	// Wall predicaat symmetrisch maken
+	//! y1[yCo],y2[yCo] : Wall(x,y1,Down) & y2=-1+y1 <=> Wall(x,y2,Up).
+	//! y1[yCo],y2[yCo] : Wall(x,y1,Up) & y2=1+y1 => Wall(x,y2,Down).
+	//! x1[xCo],x2[xCo] : Wall(x1,y,Right) & x2=-1+x1 <=> Wall(x2,y,Left).
+	//! x1[xCo],x2[xCo] : Wall(x1,y,Left) & x2=1+x1 => Wall(x2,y,Right).
+//	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ! d1[dir],d2[dir] : 
+//									( Wall(x1,y1,d1) & Transition(d1,x1,y1,x2,y2) & OppositeDir(d1,d2) )
+//									=> Wall(x2,y2,d2).
+	
+	// Alle vakjes zijn aaneengesloten
+	//! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ReachInStep(x1,y1,x2,y2) <=> ( (x1=x2+1 & ~Wall(x1,y1,Right))
+	//																	| (y1=y2+1 & ~Wall(x1,y1,Up)) ).
+	//! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ReachInStep(x1,y1,x2,y2) <=> ReachInStep(x2,y2,x1,y1).
+	//{
+	//	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ? d[dir] :( Transition(d,x1,y1,x2,y2) 
+	//																	& ~Wall(x1,y1,d) & Pos(x1,y1) & Pos(x2,y2) ).
+	//	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ? x3[xCo], y3[yCo] : Reach(x1,y1,x3,y3) & Reach(x3,y3,x2,y2).
+	//}
+
+//	{
+//		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : CorrectRelation(x1,y1,x2,y2) <- CorrectRelation(x2,y2,x1,y1).
+//		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : CorrectRelation(x1,y1,x2,y2) <- NoPos(x1,y1).
+//		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : CorrectRelation(x1,y1,x2,y2) <- x1=x2&y1=y2.
+//		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : CorrectRelation(x1,y1,x2,y2) <- ? x3[xCo],y3[yCo],d[dir] :(Transition(d,x1,y1,x3,y3) & ~Wall(x1,y1,d) & Pos(x3,y3) 
+//																		& CorrectRelation(x2,y2,x3,y3)).
+//	}
+	
+	
+
+	
+	// GameLost en GameWon hebben de juiste interpretatie in functie v d andere predicaten
+//	~GameLost & ~ (? x[xCo],y[yCo] : Gold(x,y)) <=> GameWon.
+//	(? x[xCo],y[yCo], a[agent]: Position(pacman,x,y) & Position(a,x,y) & ~a=pacman)<=>GameLost.
+	
+	// Iedereen is op exact 1 plaats
+//	!x1[xCo],x2[xCo],y1[yCo],y2[yCo],a[agent]:((Position(a,x1,y1)&Position(a,x2,y2))=>(x1=x2&y1=y2)).
+	
+	// Niemand staat op plaatsen waar geen vakje is
+//	!a[agent],x[xCo],y[yCo]:(Position(a,x,y)=>~NoPos(x,y)).
+	
+	// Er kan enkel goud liggen op plaatsen waar een vakje is
+//	! x[xCo],y[yCo] : Gold(x,y) => ~NoPos(x,y).
+	
+	// Niemand beweegt door muren
+//	! x[xCo],y[yCo],a[agent],d[dir]:(Wall(x,y,d)&Position(a,x,y)=>~Move(a,d)).
+	
+	// Iedereen kan hoogstens in 1 richting tegelijk bewegen
+//	! a[agent] : ! d1[dir],d2[dir] : ( Move(a,d1) & Move(a,d2) ) => d1=d2.
+	
+	// Ghosts kunnen niet omkeren
+	//OppositeDir(Right,Left).
+	//OppositeDir(Up,Down).
+	//! d1[dir],d2[dir] : OppositeDir(d1,d2) <=> OppositeDir(d2,d1).
+//	! a[agent] : ! d [dir] : ! prevD [dir] : a=pacman | ( ( Move(a,d) & PreviousMove(a,prevD) ) => ~OppositeDir(d,prevD) ).
+	
+	// Pacman laat geen goud liggen.
+//	! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : ! d[dir] : ( PreviousMove(pacman,d) & Transition(d,x1,y1,x2,y2) & Position(pacman,x2,y2) ) 
+//															=> ~Gold(x1,y1).
+
+	// Afhankelijk van of het spel al gedaan is moet iedereen bewegen/mag niemand bewegen
+//	GameEnded<=>~(?d[dir],a[agent]:Move(a,d)).
+	
+	// Niemand beweegt van het bord af
+//	!a[agent],x1[xCo],y1[yCo],x2[xCo],y2[yCo],d[dir]:Position(a,x1,y1)&Move(a,d)&Transition(d,x1,y1,x2,y2)=>Pos(x2,y2).
+}
+
+
+/*
+Some instance for the time-independent Pacman game.
+*/
+include <mx>
+
+procedure check() {
+	local strucs={
+//		{allPos, "allPos", 1 } ,
+		{split, "split", 0 } ,
+//		{invalidGold, "invalidGold", 0}, 
+//		{cheater2, "cheater2", 0 } ,
+//		{cheater3, "cheater3", 0 } ,
+//		{huge, "huge", 2},
+//		{winlose, "winlose", 0 } ,
+//		{win, "win", 1 } ,
+//		{lose, "lose", 1 } ,
+	}
+
+
+	stdoptions.liftedunitpropagation=false
+	stdoptions.groundwithbounds=false
+	
+	
+	for i = 1, #strucs do
+		local curr = strucs[i]
+		local struc = curr[1]
+		local name = curr[2]
+		local expected = curr[3]
+		stdoptions.nbmodels = expected + 1
+		print("Veryfing", name)
+		local models = modelexpand(PacmanTheory,curr[1])
+		printcore(PacmanTheory,curr[1])
+		local modelsfound = #models
+		if modelsfound > expected then
+			print(">>>>>>> Verification failed. Found too many models for", name)
+			printmodels(models)
+		elseif modelsfound < expected then
+			print(">>>>>>> Verification failed. Found too few models for", name)
+			printmodels(models)
+		else
+			print("Verification succeeded for", name)
+		end
+	end
+	
+	
+
+
+}
+
+
+structure split : PacmanVoc{
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; Pinky; Inky; Clyde}
+	PreviousMove={p,d;Blinky,d;Pinky,d;Inky,d;Clyde,d}
+
+	NoPos = {1,2;2,2;3,2;4,2}
+
+	Wall = {}
+
+}
+
+structure invalidGold : PacmanVoc{
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; Pinky; Inky; Clyde}
+	PreviousMove={p,d;Blinky,d;Pinky,d;Inky,d;Clyde,d}
+
+	NoPos = {1,1; 1,2; 1,3; 1,4; 2,1; 4,3; 4,4; 2,4; 3,4}
+
+	Wall = {}
+
+	Gold={2,2;1,4}
+
+}
+
+
+structure cheater2 : PacmanVoc{
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; Pinky; Inky; Clyde}
+	PreviousMove={p,d;Blinky,d;Pinky,d;Inky,d;Clyde,d}
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; 4,4; 2,4; 3,4}
+
+	Wall = {2,2,d}
+	
+	Position<ct> = {p,2,2}
+
+	Move<ct> = {p,d}
+
+	
+}
+
+structure cheater3 : PacmanVoc{
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; Pinky; Inky; Clyde}
+	PreviousMove={p,d;Blinky,d;Pinky,d;Inky,d;Clyde,d}
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+
+	Wall = {2,2,d}
+	
+	Position<ct> = {p,4,4}
+
+	Move<ct> = {p,d}
+
+	
+}
+
+structure huge : PacmanVoc{
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+        xCo = {1..12}
+        yCo = {1..10}
+        NoPos = {2,3;2,8;5,1;5,10;6,5;6,6;7,5;7,6;8,1;9,1;8,10;9,10}
+        Wall = {
+                        2,1,u; 2,4,u; 2,6,u; 2,9,u; 
+                        3,1,u; 3,4,u; 3,6,u; 3,9,u; 3,5,u;
+                        4,3,u; 4,5,u; 4,7,u;
+                        5,3,u; 5,7,u;
+                        6,2,u; 6,8,u;
+                        7,2,u; 7,8,u;
+                        8,3,u; 8,7,u;
+                        9,2,u; 9,5,u; 9,8,u;
+                        10,4,u; 10,6,u;
+                        11,1,u; 11,3,u; 11,9,u; 11,9,u;
+                        12,5,u;
+                        
+                        1,5,r; 1,6,r; 
+                        3,2,r; 3,9,r; 
+                        4,3,r; 4,4,r; 4,7,r; 4,8,r; 
+                        6,1,r; 6,2,r; 6,9,r; 6,10,r; 
+                        8,4,r; 8,7,r; 
+                        9,3,r; 9,8,r; 
+                        10,2,r; 10,5,r; 10,6,r; 10,9,r;
+                        11,3,r; 11,4,r; 11,7,r; 11,8,r; 
+                        
+                        }
+	pacman=p
+	agent={p;Blinky}
+        Position= {p,10,6; Blinky,1,1;}
+	PreviousMove={Blinky,d; p,r}  
+	Move<ct> = {Blinky,r} //Pacman has two possible moves
+
+	Gold = {2,5}
+}
+
+structure winlose : PacmanVoc{
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; Pinky; Inky; Clyde}
+	PreviousMove={p,d;Blinky,d;Pinky,d;Inky,d;Clyde,d}
+
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+
+	Wall = {2,2,d}
+	
+	GameWon=true
+	GameLost=true
+
+	
+}
+
+structure win : PacmanVoc{
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; }
+	PreviousMove={p,u;Blinky,u;}
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position={p,1,3;Blinky,1,4}
+
+	Wall = {2,2,d}
+	
+	GameWon=true
+
+	
+}
+
+structure lose : PacmanVoc{
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; }
+	PreviousMove={p,u;Blinky,u;}
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position<ct> = {p,1,3}
+
+	Wall = {2,2,d}
+	
+	GameLost=true
+	Gold={}
+
+	
+}
+
