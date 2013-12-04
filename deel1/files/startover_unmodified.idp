@@ -36,7 +36,6 @@ vocabulary PacmanVoc{
 	IsWall(xCo,yCo,dir)
 	Reach(xCo,yCo,xCo,yCo)
 	GameEnded
-	Edge(xCo,yCo,xCo,yCo)
 
 }
 
@@ -76,10 +75,7 @@ theory PacmanTheory:PacmanVoc{
 		!x2[xCo],y2[yCo],d[dir]: IsWall(x2,y2,OppositeDir(d)) <- ?x1[xCo],y1[yCo]: IsWall(x1,y1,d) & Transition(d,x1,y1,x2,y2).
 		//!x[xCo],y[yCo],d[dir]: IsWall(TransX(x,d),TransY(y,d),OppositeDir(d)) <- IsWall(x,y,d).
 	}
-	{
-		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Edge(x1,y1,x2,y2) <- ? d[dir] :Transition(d,x1,y1,x2,y2) 
-																		& ~IsWall(x1,y1,d) & Pos(x1,y1) & Pos(x2,y2).
-	}
+	
 
 	// Alle vakjes zijn aaneengesloten
 		//Reach: 2 vakjes kunnen elkaar bereiken via aaneenliggende vakjes die deel 
@@ -87,12 +83,16 @@ theory PacmanTheory:PacmanVoc{
 	{
 			// Een vakje dat deel is van het spel kan zichzelf bereiken
 		! x[xCo],y[yCo] : Reach(x,y,x,y) <-Pos(x,y).
-		// Als 2 vakjes hetzelfde vakje kunnen bereiken, kunnen ze elkaar bereiken
-		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ?x3[xCo],y3[yCo]:Edge(x1,y1,x3,y3)&Reach(x3,y3,x2,y2).
+			// Een vakje kan zijn buur bereiken als ze allebei deel van het spel (Pos) zijn en er geen muur tussen staat
+		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ? d[dir] :Transition(d,x1,y1,x2,y2) 
+																		& ~IsWall(x1,y1,d) & Pos(x1,y1) & Pos(x2,y2).																	
+		//! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ? d[dir]: x2=TransX(1,d) & y2=TransY(y1,d)
+		//																& ~IsWall(x1,y1,d) & Pos(x1,y1) & Pos(x2,y2).
+			// Als 2 vakjes hetzelfde vakje kunnen bereiken, kunnen ze elkaar bereiken
+		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ?x3[xCo],y3[yCo]:Reach(x1,y1,x3,y3)&Reach(x3,y3,x2,y2).
 	}
 		// Alle vakjes die deel zijn van het spel (Pos) kunnen elkaar bereiken
-	//!x1[xCo],y1[yCo],x2[xCo],y2[yCo]:Pos(x1,y1)&Pos(x2,y2)<=>Reach(x1,y1,x2,y2).
-	?x1[xCo],y1[yCo]: Pos(x1,y1) & (!x2[xCo],y2[yCo]:Pos(x2,y2)=>Reach(x1,y1,x2,y2)).
+	!x1[xCo],y1[yCo],x2[xCo],y2[yCo]:Pos(x1,y1)&Pos(x2,y2)<=>Reach(x1,y1,x2,y2).
 	
 	// Iedereen is op exact 1 plaats
 	!a[agent]:#{x[xCo] y[yCo] : Position(a,x,y)}=1.
