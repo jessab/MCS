@@ -1,0 +1,70 @@
+/**
+ * Title: A new IDP source file
+ * Author: bartb
+ */
+ procedure setparameters(){
+	//IF you run on your own pc, please make sure these things are okay.
+	idpdraw="/localhost/packages/eclipse/eclipse-4.3-ide/external/idpdraw"
+	clasp="/localhost/packages/eclipse/eclipse-4.3-ide/external/clasp  --verbose=0 --asp09 "
+	gringo="/localhost/packages/eclipse/eclipse-4.3-ide/external/gringo"
+	
+	pacmanvisfile="vis.asp"
+	pacmanvisfileNoTime="visnotime.asp"
+	
+	ul="./upperlower.sh"
+	draw="./grepdraw.sh"
+	
+	//TODO REMOVE THIS 
+	//idpdraw="/home/bartb/Desktop/external/idpdraw"
+	//clasp="/home/bartb/Desktop/external/clasp  --verbose=0 --asp09 "
+	//gringo="/home/bartb/Desktop/external/gringo"
+	
+}
+
+
+procedure visualise(struc){
+	setparameters()
+	vis(struc, pacmanvisfile)
+}
+
+procedure visualiseNoTime(struc){
+	setparameters()
+	vis(struc, pacmanvisfileNoTime)
+}
+
+procedure vis(struc, visfile){
+	solfile = tempfilename()
+	solfile2 = tempfilename()
+	stdoptions.language="asp"
+	file = io.open(solfile,"w")
+	
+	file:write(tostring(struc))
+	file:close()
+	
+	os.execute(ul.." "..solfile.." "..solfile2)
+
+	outputvisfile = tempfilename()
+	err = os.execute(gringo.." "..visfile.." "..solfile2.." | "..clasp.."  > "..outputvisfile)
+	os.execute(draw.." "..outputvisfile.." "..idpdraw)
+	
+}
+
+
+procedure tempfilename(){
+	local windows
+	filesep = package.config:sub(1,1)
+	if filesep == '\\' then
+		windows = true
+	else 
+		windows = false
+	end
+	
+	if windows then
+		return  os.getenv("TMP")..os.tmpname()
+	else
+		return os.tmpname()
+	end
+}
+
+
+

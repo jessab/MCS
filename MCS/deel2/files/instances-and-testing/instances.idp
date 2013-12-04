@@ -1,0 +1,277 @@
+/**
+ * Title: A new IDP source file
+ * Author: bartb
+ */
+include "../oplossing/solution.idp" //TODO Replace this with the path to your solution
+
+ 
+structure split : PacmanVoc{
+	time = {0..3}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; blinky; pinky; inky; clyde}
+
+	NoPos = {1,2;2,2;3,2;4,2}
+
+	Wall = {}
+
+}
+
+structure invalidGold : PacmanVoc{
+	time={1..3}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; blinky; pinky; inky; clyde}
+
+	NoPos = {1,1; 1,2; 1,3; 1,4; 2,1; 4,3; 4,4; 2,4; 3,4}
+
+	Wall = {}
+
+	Gold={1,2,2;1,1,4}
+
+}
+
+
+structure cheater2 : PacmanVoc{
+	time = {0..4}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; blinky; pinky; inky; clyde}
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; 4,4; 2,4; 3,4}
+
+	Wall = {2,2,d}
+	
+	Position<ct> = {1,p,2,2}
+
+	Move<ct> = {1, p, d}
+
+	
+}
+
+structure cheater3 : PacmanVoc{
+	time = {0..4}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; blinky; pinky; inky; clyde}
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+
+	Wall = {2,2,d}
+	
+	Position<ct> ={2, p, 4,4}
+
+	Move<ct> ={2,p,d}
+
+	
+}
+
+
+structure winlose : PacmanVoc{
+	time={0..4}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; blinky; pinky; inky; clyde}
+
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+
+	Wall = {2,2,d}
+	
+	GameWon<ct> ={4}
+	GameLost<ct> ={4}
+
+	
+}
+
+//TODO FROM HERE: check and correct assignments
+structure win : PacmanVoc{
+	time={0..4}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; blinky; }
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position<ct> ={1,p,1,3;1,blinky,1,4}
+
+	Wall = {2,2,d}
+	
+	GameWon<ct> ={0}
+
+	
+}
+
+structure lose : PacmanVoc{
+	time={0..4}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; blinky; }
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position<ct> ={1,p,1,3}
+
+	Wall = {2,2,d}
+	
+	GameLost<ct> ={0}
+	Gold={}
+
+	
+}
+
+structure loseCrossing : PacmanVoc{
+	time={0..2}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; blinky; }
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position<ct> ={1,p,1,3}
+	Position<cf> ={1,blinky,1,3}
+
+	Wall = {2,2,d}
+	
+	GameLost<ct> ={1}
+	GameLost<cf> ={0}
+	Gold={0,1,3;1,1,3;2,1,3}
+
+	
+}
+
+
+
+
+
+structure small : PacmanVoc{
+	time={0..50}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..5}
+	yCo = {1..5}
+
+	pacman=p
+	agent={p; blinky; }
+
+	NoPos = {1,1; 1,2;  4,2; 4,3; }
+	I_position={p,1,3; blinky, 4,4}
+
+	Wall = {2,2,u;2,3,r;3,2,d;4,4,u;1,4,r;2,4,u}
+	
+	I_gold<cf> = {1,1; 1,2; 4,2; 4,3; }
+	I_gold<u> = {1,3}
+		
+}
+
+
+
+
+
+
+structure huge : PacmanVoc{
+	time={0..100}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+        xCo = {1..12}
+        yCo = {1..10}
+        NoPos = {2,3;2,8;5,1;5,10;6,5;6,6;7,5;7,6;8,1;9,1;8,10;9,10}
+        Wall = {
+                        2,1,u; 2,4,u; 2,6,u; 2,9,u; 
+                        3,1,u; 3,4,u; 3,6,u; 3,9,u; 3,5,u;
+                        4,3,u; 4,5,u; 4,7,u;
+                        5,3,u; 5,7,u;
+                        6,2,u; 6,8,u;
+                        7,2,u; 7,8,u;
+                        8,3,u; 8,7,u;
+                        9,2,u; 9,5,u; 9,8,u;
+                        10,4,u; 10,6,u;
+                        11,1,u; 11,3,u; 11,9,u; 11,9,u;
+                        12,5,u;
+                        
+                        1,5,r; 1,6,r; 
+                        3,2,r; 3,9,r; 
+                        4,3,r; 4,4,r; 4,7,r; 4,8,r; 
+                        6,2,r; 6,9,r; 
+                        8,4,r; 8,7,r; 
+                        9,3,r; 9,8,r; 
+                        10,2,r; 10,5,r; 10,6,r; 10,9,r;
+                        11,3,r; 11,4,r; 11,7,r; 11,8,r; 
+                        
+                        }
+	pacman=p
+	agent={p; blinky; pinky; inky; clyde}
+	I_position={p,8,5;  blinky,1,1; pinky,3,3; inky,6,7; clyde,10,3 }
+
+	I_gold<cf> = {2,3;2,8;5,1;5,10;6,5;6,6;7,5;7,6;8,1;9,1;8,10;9,10}
+	I_gold<u> ={8,5 ; }
+}
