@@ -50,6 +50,7 @@ vocabulary PacmanVoc{
         GameLost(time)
         GameWon(time)
         GameEnded(time)
+        DeadEnd(time)
 }
 
 theory TimeTheory:PacmanVoc{
@@ -139,8 +140,8 @@ theory PacmanTheory:PacmanVoc{
 
         // GameLost als een ghost op hetzelfde vakje als pacman staat
         !t[time]:(? x[xCo],y[yCo], a[agent]: Position(t,pacman,x,y) & Position(t,a,x,y) & ~a=pacman)<=>GameLost(t).
-        // GameWon als al het goud op is en het spel niet verloren is
-        !t[time]:~GameLost(t) & ~ (? x[xCo],y[yCo] : Gold(t,x,y)) <=> GameWon(t). //Als aan de voorwaarden voor gameLost en gameWon voldaan is, dan is het ook verloren
+        // GameWon als al het goud op is of een spook in een doodlopende gang zit en het spel niet verloren is
+        !t[time]:~GameLost(t) & (~ (? x[xCo],y[yCo] : Gold(t,x,y)) | DeadEnd(t)) <=> GameWon(t). //Als aan de voorwaarden voor gameLost en gameWon voldaan is, dan is het ook verloren
                 
         // GameEnded: Het spel is gedaan, het is verloren of gewonnen
         !t[time]:GameEnded(t)<=>GameLost(t)|GameWon(t).
@@ -149,8 +150,13 @@ theory PacmanTheory:PacmanVoc{
         !t[time]:GameEnded(t)<=>~?a[agent],d[dir]:Move(t,a,d).
         !t[time]:~GameEnded(t)<=>!a[agent]:?d[dir]:Move(t,a,d).
         
-        //TODO: Doodlopende gangen, kruisen van spook en pacman
-        
+        //Doodlopende gangen
+        ?t[time] a[agent] x1[xCo] y1[yCo] x2[xCo] y2[yCo] d1[dir]: a~=pacman //spook
+        		& Position(t,a,x1,y1) & Move(t,a,d) & Transition(d,x1,y1,x2,y2) // volgende positie bekomen
+        		& (!d2[dir] : d2~=OppositeDir(d1) =>  IsWall(x2,y2,d2)) // als er geen richting is die ze van daaruit kunnen gaan (Uitbreiding IsWall of Edge met dir)
+        		<=> DeadEnd(Next(t)).
+        		
+        //kruisen van spook en pacman
         
         
         // Successor State Action Axiom & Inertia
