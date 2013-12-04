@@ -3,219 +3,244 @@
  */
 
 vocabulary PacmanVoc{
-	
-	type time isa int
-	//Only use Start and Next in your theories, never hardcode integer timepoints!
-	Start: time
-	partial Next(time):time
-	
-	
-	type dir //We guarantee you that dir, Left, Right, Up, Down will always be correctly interpreted in structures. You should not check this.
-	Down: dir
-	Left: dir
-	Right: dir
-	Up: dir
+        
+        type time isa int
+        //Only use Start and Next in your theories, never hardcode integer timepoints!
+        Start: time
+        partial Next(time):time
+        
+        
+        type dir //We guarantee you that dir, Left, Right, Up, Down will always be correctly interpreted in structures. You should not check this.
+        Down: dir
+        Left: dir
+        Right: dir
+        Up: dir
 
-	type xCo isa int
-	type yCo isa int
+        type xCo isa int
+        type yCo isa int
 
-	type agent //The ghosts and pacman
-	pacman:agent
+        type agent //The ghosts and pacman
+        pacman:agent
+        
+        // fluents
+        Position(time, agent, xCo, yCo)
+        I_position(agent, xCo, yCo)                //Initial positions of agents
+        C_position(time, agent, xCo, yCo)
+        Cn_position(time, agent, xCo, yCo)
+        
+        Gold(time, xCo, yCo)
+        I_gold(xCo, yCo)                                //Initial gold location
+        //C_gold(time, xCo, yCo)	//niet nodig want goud kan niet ontstaan
+        Cn_gold(time, xCo, yCo)
+        
+        // action
+        Move(time, agent, dir)
+        
+        // invariable
+        NoPos(xCo,yCo)
+        Pos(xCo,yCo)
+        Wall(xCo,yCo,dir)
+        IsWall(xCo,yCo,dir)
+        OppositeDir(dir):dir
+        Transition(dir,xCo,yCo,xCo,yCo)
+        Edge(xCo,yCo,xCo,yCo)
+        Reach(xCo,yCo,xCo,yCo)
 
-	NoPos(xCo,yCo) 
-	Wall(xCo,yCo,dir)
-	
-
-	Gold(time, xCo, yCo)
-	GameLost(time)
-	GameWon(time)
-	Position(time, agent, xCo, yCo)
-	
-	Move(time, agent, dir)
-	
-	I_gold(xCo, yCo)				//Initial gold location
-	I_position(agent, xCo, yCo)		//Initial positions of agents
-
-	/*Eigen predicaten/functies */
-	OppositeDir(dir):dir
-	Transition(dir,xCo,yCo,xCo,yCo)
-	Pos(xCo,yCo)
-	IsWall(xCo,yCo,dir)
-	Reach(xCo,yCo,xCo,yCo)
-	GameEnded(time)
-	Edge(xCo,yCo,xCo,yCo)
+        // game winning
+        GameLost(time)
+        GameWon(time)
+        GameEnded(time)
 }
 
 theory TimeTheory:PacmanVoc{
-	{
-		Start = MIN[:time].
-		!t: Next(t) = t+1 <- time(t+1).
-	}
+        {
+                Start = MIN[:time].
+                !t: Next(t) = t+1 <- time(t+1).
+        }
 }
 
 
 
 theory PacmanTheory:PacmanVoc{
-	// OppositeDirection, uitdrukken dat twee richtingen elkaars tegengestelden zijn
-	OppositeDir(Left)=Right.
-	OppositeDir(Up)=Down.
-	!d[dir]:OppositeDir(OppositeDir(d))=d.
 	
-	// Transition, de relatie tussen verandering van coordinaten en richting.
-	// Impliciet, wanneer er een transition bestaat, liggen twee vakjes naast elkaar.
-	{
-		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Down ,x1,y1,x2,y2) <- x2=x1 & y2=-1+y1.
-		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Left ,x1,y1,x2,y2) <- x2=-1+x1 & y2=y1.
-		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Up   ,x1,y1,x2,y2) <- x2=x1 & y2= 1+y1.
-		!x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Right,x1,y1,x2,y2) <- x2= 1+x1 & y2=y1.
-	}
+	// Invariabele definities
 	
+        // OppositeDirection, uitdrukken dat twee richtingen elkaars tegengestelden zijn
+        OppositeDir(Left)=Right.
+        OppositeDir(Up)=Down.
+        !d[dir]:OppositeDir(OppositeDir(d))=d.
+        
+        // Transition, de relatie tussen verandering van coordinaten en richting.
+        // Impliciet, wanneer er een transition bestaat, liggen twee vakjes naast elkaar.
+        {
+                !x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Down ,x1,y1,x2,y2) <- x2=x1 & y2=-1+y1.
+                !x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Left ,x1,y1,x2,y2) <- x2=-1+x1 & y2=y1.
+                !x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Up   ,x1,y1,x2,y2) <- x2=x1 & y2= 1+y1.
+                !x1[xCo], y1[yCo], x2[xCo], y2[yCo]: Transition(Right,x1,y1,x2,y2) <- x2= 1+x1 & y2=y1.
+        }
+        
+		// Pos: Een positie waar wel een vakje is
+        !x[xCo],y[yCo]:Pos(x,y)<=>~NoPos(x,y).
+        
+        // Wall predicaat symmetrisch maken
+        {
+                !x[xCo],y[yCo],d[dir]: IsWall(x,y,d) <- Wall(x,y,d).
+                !x2[xCo],y2[yCo],d[dir]: IsWall(x2,y2,OppositeDir(d)) <- ?x1[xCo],y1[yCo]: IsWall(x1,y1,d) & Transition(d,x1,y1,x2,y2).
+        }
+        
+        {
+                ! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Edge(x1,y1,x2,y2) <- ? d[dir] :Transition(d,x1,y1,x2,y2) 
+													& ~IsWall(x1,y1,d) & Pos(x1,y1) & Pos(x2,y2).
+        }
 
-	
-	// Pos: Een positie waar wel een vakje is
-	!x[xCo],y[yCo]:Pos(x,y)<=>~NoPos(x,y).
-	
-	// Wall predicaat symmetrisch maken
-	{
-		!x[xCo],y[yCo],d[dir]: IsWall(x,y,d) <- Wall(x,y,d).
-		!x2[xCo],y2[yCo],d[dir]: IsWall(x2,y2,OppositeDir(d)) <- ?x1[xCo],y1[yCo]: IsWall(x1,y1,d) & Transition(d,x1,y1,x2,y2).
-	}
-	
-	{
-		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Edge(x1,y1,x2,y2) <- ? d[dir] :Transition(d,x1,y1,x2,y2) 
-																		& ~IsWall(x1,y1,d) & Pos(x1,y1) & Pos(x2,y2).
-	}
 
-	// Alle vakjes zijn aaneengesloten
-		//Reach: 2 vakjes kunnen elkaar bereiken via aaneenliggende vakjes die deel 
-		//       zijn van het spel (Pos) en waar geen muur tussen staat.
-	{
-			// Een vakje dat deel is van het spel kan zichzelf bereiken
-		! x[xCo],y[yCo] : Reach(x,y,x,y) <-Pos(x,y).
-		// Als 2 vakjes hetzelfde vakje kunnen bereiken, kunnen ze elkaar bereiken
-		! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ?x3[xCo],y3[yCo]:Edge(x1,y1,x3,y3)&Reach(x3,y3,x2,y2).
-	}
-		// Alle vakjes die deel zijn van het spel (Pos) kunnen elkaar bereiken
-	//!x1[xCo],y1[yCo],x2[xCo],y2[yCo]:Pos(x1,y1)&Pos(x2,y2)<=>Reach(x1,y1,x2,y2).
-	?x1[xCo],y1[yCo]: Pos(x1,y1) & (!x2[xCo],y2[yCo]:Pos(x2,y2)=>Reach(x1,y1,x2,y2)).
+	// Invariabele precondities
 	
-	// Iedereen is op exact 1 plaats
-	!t[time],a[agent]:#{x[xCo] y[yCo] : Position(t,a,x,y)}=1.
-				
-	// Niemand staat op plaatsen waar geen vakje is
-	!t[time],a[agent],x[xCo],y[yCo]:Position(t,a,x,y)=>Pos(x,y).
-	
-	// Er kan enkel goud liggen op plaatsen waar een vakje is
-	!t[time],x[xCo],y[yCo] : Gold(t,x,y) => Pos(x,y).
-	
-	// Niemand beweegt door muren
-	!t[time],x[xCo],y[yCo],a[agent],d[dir]:(IsWall(x,y,d)&Position(t,a,x,y)=>~Move(t,a,d)).
-	
-	// Niemand beweegt van het bord af
-	!t[time],a[agent],x1[xCo],y1[yCo],d[dir]:Position(t,a,x1,y1)&Move(t,a,d)=>?x2[xCo],y2[yCo]:Transition(d,x1,y1,x2,y2)&Pos(x2,y2).
-	
-	// Iedereen kan hoogstens in 1 richting tegelijk bewegen
-	!t[time],a[agent]:#{d[dir] : Move(t,a,d)} < 2.
-	
-	// Ghosts kunnen niet omkeren
-	! t[time],a[agent],d [dir], prevD[dir] : a=pacman | ( Move(Next(t),a,d) & Move(t,a,prevD)=>~prevD=OppositeDir(d)).
-	
-	// Pacman laat geen goud liggen.
-	! t[time],p[agent],d[dir],x1[xCo],y1[yCo],x2[xCo],y2[yCo]:p=pacman&Move(t,p,d)&Position(Next(t),p,x2,y2)&Transition(d,x1,y1,x2,y2)
-				=> ~Gold(Next(t),x1,y1).
+        // Alle vakjes zijn aaneengesloten
+                //Reach: 2 vakjes kunnen elkaar bereiken via aaneenliggende vakjes die deel 
+                //       zijn van het spel (Pos) en waar geen muur tussen staat.
+        {
+                        // Een vakje dat deel is van het spel kan zichzelf bereiken
+                ! x[xCo],y[yCo] : Reach(x,y,x,y) <-Pos(x,y).
+                // Als 2 vakjes hetzelfde vakje kunnen bereiken, kunnen ze elkaar bereiken
+                ! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ?x3[xCo],y3[yCo]:Edge(x1,y1,x3,y3)&Reach(x3,y3,x2,y2).
+        }
+                // Alle vakjes die deel zijn van het spel (Pos) kunnen elkaar bereiken
+        //!x1[xCo],y1[yCo],x2[xCo],y2[yCo]:Pos(x1,y1)&Pos(x2,y2)<=>Reach(x1,y1,x2,y2).
+        ?x1[xCo],y1[yCo]: Pos(x1,y1) & (!x2[xCo],y2[yCo]:Pos(x2,y2)=>Reach(x1,y1,x2,y2)).
+        
+        
+     // Precondities (tijdshebbende)
+     
+        // Iedereen is op exact 1 plaats
+        !t[time],a[agent]:#{x[xCo] y[yCo] : Position(t,a,x,y)}=1.
+                                
+        // Niemand staat op plaatsen waar geen vakje is
+        !t[time],a[agent],x[xCo],y[yCo]:Position(t,a,x,y)=>Pos(x,y).
+        
+        // Er kan enkel goud liggen op plaatsen waar een vakje is
+        !t[time],x[xCo],y[yCo] : Gold(t,x,y) => Pos(x,y).
+        
+        // Niemand beweegt door muren
+        !t[time],x[xCo],y[yCo],a[agent],d[dir]:(IsWall(x,y,d)&Position(t,a,x,y)=>~Move(t,a,d)).
+        
+        // Niemand beweegt van het bord af
+        !t[time],a[agent],x1[xCo],y1[yCo],d[dir]:Position(t,a,x1,y1)&Move(t,a,d)=>?x2[xCo],y2[yCo]:Transition(d,x1,y1,x2,y2)&Pos(x2,y2).
+        
+        // Iedereen kan hoogstens in 1 richting tegelijk bewegen
+        !t[time],a[agent]:#{d[dir] : Move(t,a,d)} < 2.
+        
+        // Ghosts kunnen niet omkeren
+        ! t[time],a[agent],d [dir], prevD[dir] : a=pacman | ( Move(Next(t),a,d) & Move(t,a,prevD)=>~prevD=OppositeDir(d)).
+        
+        // Pacman laat geen goud liggen.
+        ! t[time],p[agent],d[dir],x1[xCo],y1[yCo],x2[xCo],y2[yCo]:p=pacman&Move(t,p,d)&Position(Next(t),p,x2,y2)&Transition(d,x1,y1,x2,y2)
+                                => ~Gold(Next(t),x1,y1).
 
-	// GameLost als een ghost op hetzelfde vakje als pacman staat
-	!t[time]:(? x[xCo],y[yCo], a[agent]: Position(t,pacman,x,y) & Position(t,a,x,y) & ~a=pacman)<=>GameLost(t).
-	// GameWon als al het goud op is en het spel niet verloren is
-	!t[time]:~GameLost(t) & ~ (? x[xCo],y[yCo] : Gold(t,x,y)) <=> GameWon(t). //Als aan de voorwaarden voor gameLost en gameWon voldaan is, dan is het ook verloren
-		
-	// GameEnded: Het spel is gedaan, het is verloren of gewonnen
-	!t[time]:GameEnded(t)<=>GameLost(t)|GameWon(t).
-	
-	// Afhankelijk van of het spel al gedaan is moet iedereen bewegen/mag niemand bewegen
-	!t[time]:GameEnded(t)<=>~?a[agent],d[dir]:Move(t,a,d).
-	!t[time]:~GameEnded(t)<=>!a[agent]:?d[dir]:Move(t,a,d).
-	
-	//TODO: Doodlopende gangen, kruisen van spook en pacman
-	
-	
-	
-	{
-	// Successor State Axiom
-  	}
+        // GameLost als een ghost op hetzelfde vakje als pacman staat
+        !t[time]:(? x[xCo],y[yCo], a[agent]: Position(t,pacman,x,y) & Position(t,a,x,y) & ~a=pacman)<=>GameLost(t).
+        // GameWon als al het goud op is en het spel niet verloren is
+        !t[time]:~GameLost(t) & ~ (? x[xCo],y[yCo] : Gold(t,x,y)) <=> GameWon(t). //Als aan de voorwaarden voor gameLost en gameWon voldaan is, dan is het ook verloren
+                
+        // GameEnded: Het spel is gedaan, het is verloren of gewonnen
+        !t[time]:GameEnded(t)<=>GameLost(t)|GameWon(t).
+        
+        // Afhankelijk van of het spel al gedaan is moet iedereen bewegen/mag niemand bewegen
+        !t[time]:GameEnded(t)<=>~?a[agent],d[dir]:Move(t,a,d).
+        !t[time]:~GameEnded(t)<=>!a[agent]:?d[dir]:Move(t,a,d).
+        
+        //TODO: Doodlopende gangen, kruisen van spook en pacman
+        
+        
+        
+        // Successor State Action Axiom & Inertia
+        {	//Position
+			!a[agent] x[xCo] y[yCo]: Position(Start,a,x,y) <- I_position(a,x,y).
+			!a[agent] x[xCo] y[yCo] t[time]: Position(Next(t),a,x,y) <- C_position(t,a,x,y).
+			!a[agent] x[xCo] y[yCo] t[time]: Position(Next(t),a,x,y) <- Position(t,a,x,y) & ~Cn_position(t,a,x,y).
+		}
+		{	//Gold
+			!x[xCo] y[yCo] : Gold(Start,x,y) <- I_gold(x,y).
+			!x[xCo] y[yCo] t[time] : Gold(t,x,y) <- Gold & ~Cn_gold(t,x,y).
+        }
 
-  	{	
-	// Causes
-  	}
-		
+		// Causes
+        {   // Position     
+        	!a[agent] x[xCo] y[yCo] t[time] : C_position(t,a,x,y) <- ? x1[xCo] y1[yCo] d[dir]: Position(t,a,x1,y1) & Move(t,a,d) & Transition(d,x1,y1,x,y).
+        	!a[agent] x[xCo] y[yCo] t[time] : Cn_position(t,a,x,y) <- ?d[dir]: Position(t,a,x,y) & Move(t,a,d).
+        }
+        {	//Gold
+        	!x[xCo] y[yCo] t[time] : Cn_gold(x,y,t) <- Position(t,pacman,x,y) & ?d[dir]:Move(t,pacman,d).
+        }
+                
 }
 
 theory verification1: PacmanVoc{
-	//Verify something here
+        //Verify something here
 }
 
 procedure verification1proc(struc){
-	//Do something here: verify verification1 in the context of structure struc. 
-	//At least print whether the verification is satisified or not.
+        //Do something here: verify verification1 in the context of structure struc. 
+        //At least print whether the verification is satisified or not.
 }
 
 theory verification2: PacmanVoc{
-	//Verify something here
+        //Verify something here
 }
 
 procedure verification2proc(struc){
-	//Do something here: verify verification2 in the context of structure struc. 
-	//At least print whether the verification is satisified or not.
+        //Do something here: verify verification2 in the context of structure struc. 
+        //At least print whether the verification is satisified or not.
 }
 
 theory verification3: PacmanVoc{
-	//Verify something here
+        //Verify something here
 }
 
 procedure verification3proc(struc){
-	//Do something here: verify verification3 in the context of structure struc. 
-	//At least print whether the verification is satisified or not.
+        //Do something here: verify verification3 in the context of structure struc. 
+        //At least print whether the verification is satisified or not.
 }
 
 theory verification4: PacmanVoc{
-	//Verify something here
+        //Verify something here
 }
 
 procedure verification4proc(struc){
-	//Do something here: verify verification4 in the context of structure struc. 
-	//At least print whether the verification is satisified or not.
+        //Do something here: verify verification4 in the context of structure struc. 
+        //At least print whether the verification is satisified or not.
 }
 
 procedure allVerifications(){
-	strucToCheck = verStruc
-	verification1proc(strucToCheck)
-	verification2proc(strucToCheck)
-	verification3proc(strucToCheck)
-	verification4proc(strucToCheck)
+        strucToCheck = verStruc
+        verification1proc(strucToCheck)
+        verification2proc(strucToCheck)
+        verification3proc(strucToCheck)
+        verification4proc(strucToCheck)
 
 }
 
 structure verStruc: PacmanVoc{
-	
-	time={0..50}
-	dir = {u;d;l;r}
-	Up=u
-	Down=d
-	Left=l
-	Right=r
+        
+        time={0..50}
+        dir = {u;d;l;r}
+        Up=u
+        Down=d
+        Left=l
+        Right=r
 
-	xCo = {1..5}
-	yCo = {1..5}
+        xCo = {1..5}
+        yCo = {1..5}
 
-	pacman=p
-	agent={p; blinky; }
+        pacman=p
+        agent={p; blinky; }
 
-	NoPos = {1,1; 1,2;  4,2; 4,3; }
-	I_position={p,1,3; blinky, 4,4}
+        NoPos = {1,1; 1,2;  4,2; 4,3; }
+        I_position={p,1,3; blinky, 4,4}
 
-	Wall = {2,2,u;2,3,r;3,2,d;4,4,u;1,4,r;2,4,u}
-	
-	I_gold<cf> = {1,1; 1,2; 4,2; 4,3; 5,5 }
-	I_gold<u> = {}
-		
+        Wall = {2,2,u;2,3,r;3,2,d;4,4,u;1,4,r;2,4,u}
+        
+        I_gold<cf> = {1,1; 1,2; 4,2; 4,3; 5,5 }
+        I_gold<u> = {}
+                
 }
