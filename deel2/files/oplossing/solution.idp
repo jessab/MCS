@@ -51,6 +51,7 @@ vocabulary PacmanVoc{
         GameWon(time)
         GameEnded(time)
         DeadEnd(time)
+        Crossed(time)
 }
 
 theory TimeTheory:PacmanVoc{
@@ -138,8 +139,11 @@ theory PacmanTheory:PacmanVoc{
         ! t[time],p[agent],d[dir],x1[xCo],y1[yCo],x2[xCo],y2[yCo]:p=pacman&Move(t,p,d)&Position(Next(t),p,x2,y2)&Transition(d,x1,y1,x2,y2)
                                 => ~Gold(Next(t),x1,y1).
 
-        // GameLost als een ghost op hetzelfde vakje als pacman staat
-        !t[time]:(? x[xCo],y[yCo], a[agent]: Position(t,pacman,x,y) & Position(t,a,x,y) & ~a=pacman)<=>GameLost(t).
+        // GameLost als een ghost op hetzelfde vakje als pacman staat of ghost en pacman elkaar gekruisd zijn
+        !t[time]:(? x[xCo],y[yCo], a[agent]: Position(t,pacman,x,y) & Position(t,a,x,y) & ~a=pacman) //pacman en ghost op zelfde positie
+        	| Crossed(t) // of ze zijn elkaar gekruisd
+        	<=> GameLost(t). // dus het spel is verloren
+        	
         // GameWon als al het goud op is of een spook in een doodlopende gang zit en het spel niet verloren is
         !t[time]:~GameLost(t) & (~ (? x[xCo],y[yCo] : Gold(t,x,y)) | DeadEnd(t)) <=> GameWon(t). //Als aan de voorwaarden voor gameLost en gameWon voldaan is, dan is het ook verloren
                 
@@ -151,13 +155,18 @@ theory PacmanTheory:PacmanVoc{
         !t[time]:~GameEnded(t)<=>!a[agent]:?d[dir]:Move(t,a,d).
         
         //Doodlopende gangen
-        ?t[time] a[agent] x1[xCo] y1[yCo] x2[xCo] y2[yCo] d1[dir]: a~=pacman //spook
-        		& Position(t,a,x1,y1) & Move(t,a,d) & Transition(d,x1,y1,x2,y2) // volgende positie bekomen
-        		& (!d2[dir] : d2~=OppositeDir(d1) =>  IsWall(x2,y2,d2)) // als er geen richting is die ze van daaruit kunnen gaan (Uitbreiding IsWall of Edge met dir)
-        		<=> DeadEnd(Next(t)).
+        ?t[time] a[agent] x[xCo] y[yCo] d1[dir]: a~=pacman //spook
+        		& Move(t,a,d)	// beweegrichting
+        		& Position(Next(t),a,x,y) // volgende positie
+        		& (!d2[dir] : d2~=OppositeDir(d1) =>  IsWall(x,y,d2)) // in elke andere richting dan de beweegrichting staat er een muur op de volgende positie
+        		<=> DeadEnd(Next(t)).	// dus het spook staat in het volgende tijdstip in een doodlopende gang
         		
         //kruisen van spook en pacman
-        
+        ?t[time] a[agent] x1[xCo] y1[yCo] x2[xCo] y2[yCo] d1[dir]:
+        	a~=pacman	// pacman en spook
+        	& Position(t,pacman,x1,y1) & Position(t,a,x2,y2) //staan op bepaalde positities op tijdstip t
+        	& Position(Next(t),pacman,x2,y2) & Position(Next(t),a,x1,y1) // verwisselen van positie in volgend tijdstip
+        	<=> Crossed(Next(t)). // dus ze zijn elkaar gekruisd in het volgende tijdstip.
         
         // Successor State Action Axiom & Inertia
         {	//Position
