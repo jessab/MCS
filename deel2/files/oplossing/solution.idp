@@ -155,28 +155,28 @@ theory PacmanTheory:PacmanVoc{
         !t[time]:~GameEnded(t)<=>!a[agent]:?d[dir]:Move(t,a,d).
         
         //Doodlopende gangen
-        ?t[time] a[agent] x[xCo] y[yCo] d1[dir]: a~=pacman //spook
-        		& Move(t,a,d)	// beweegrichting
+        {
+        	!t[time] : DeadEnd(Next(t)) <- ?a[agent] x[xCo] y[yCo] d1[dir]: a~=pacman
+        		& Move(t,a,d1)	// beweegrichting
         		& Position(Next(t),a,x,y) // volgende positie
-        		& (!d2[dir] : d2~=OppositeDir(d1) =>  IsWall(x,y,d2)) // in elke andere richting dan de beweegrichting staat er een muur op de volgende positie
-        		<=> DeadEnd(Next(t)).	// dus het spook staat in het volgende tijdstip in een doodlopende gang
+        		& (!d2[dir] : d2~=OppositeDir(d1) =>  IsWall(x,y,d2)). // in elke richting, behalve de terugkeer richting, staat er een muur op de volgende positie
+        }
         		
         //kruisen van spook en pacman
-        ?t[time] a[agent] x1[xCo] y1[yCo] x2[xCo] y2[yCo] d1[dir]:
-        	a~=pacman	// pacman en spook
-        	& Position(t,pacman,x1,y1) & Position(t,a,x2,y2) //staan op bepaalde positities op tijdstip t
-        	& Position(Next(t),pacman,x2,y2) & Position(Next(t),a,x1,y1) // verwisselen van positie in volgend tijdstip
-        	<=> Crossed(Next(t)). // dus ze zijn elkaar gekruisd in het volgende tijdstip.
+        {
+        	!t[time] : Crossed(Next(t)) <- ?a[agent] x1[xCo] y1[yCo] x2[xCo] y2[yCo]: a~=pacman //pacman en spook
+				& Position(t,pacman,x1,y1) & Position(t,a,x2,y2) //staan op bepaalde positities op tijdstip t
+        		& Position(Next(t),pacman,x2,y2) & Position(Next(t),a,x1,y1). // verwisselen van positie in volgend tijdstip
+        }
         
         // Successor State Action Axiom & Inertia
         {	//Position
 			!a[agent] x[xCo] y[yCo]: Position(Start,a,x,y) <- I_position(a,x,y).
-			!a[agent] x[xCo] y[yCo] t[time]: Position(Next(t),a,x,y) <- C_position(t,a,x,y).
-			!a[agent] x[xCo] y[yCo] t[time]: Position(Next(t),a,x,y) <- Position(t,a,x,y) & ~Cn_position(t,a,x,y).
+			!a[agent] x[xCo] y[yCo] t[time]: Position(Next(t),a,x,y) <- C_position(t,a,x,y) | (Position(t,a,x,y) & ~Cn_position(t,a,x,y)).
 		}
 		{	//Gold
 			!x[xCo] y[yCo] : Gold(Start,x,y) <- I_gold(x,y).
-			!x[xCo] y[yCo] t[time] : Gold(t,x,y) <- Gold & ~Cn_gold(t,x,y).
+			!x[xCo] y[yCo] t[time] : Gold(Next(t),x,y) <- Gold(t,x,y) & ~Cn_gold(t,x,y).
         }
 
 		// Causes
@@ -191,7 +191,10 @@ theory PacmanTheory:PacmanVoc{
 }
 
 theory verification1: PacmanVoc{
-        //Verify something here
+        // Te verifieren: Het aantal muntstukken op het bord kan enkel omlaag gaan
+        // Contradictie: Voorwaarde toevoegen dat er een tijd bestaat waar het aantal muntstukken omhoog gaat
+        
+        ?t[time] : #{x[xCo],y[yCo]:Gold(t,x,y)} < #{x[xCo],y[yCo]:Gold(Next(t),x,y)}.
 }
 
 procedure verification1proc(struc){

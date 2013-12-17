@@ -2,12 +2,13 @@
  * Title: A new IDP source file
  * Author: bartb
  */
-
-include "../oplossing/solution.idp" //TODO Replace this with the path to your solution
-include "../vis/visprocedures.idp" 
+//include "C:/Users/jessa/Dropbox/Master2/Semester1/MCS/project/deel2/files/oplossing/solution.idp"
+//include "../oplossing/solution.idp" //TODO Replace this with the path to your solution
+//include "../vis/visprocedures.idp" 
 include <mx> 
 include <table_utils>
-include "instances.idp"
+//include "instances.idp"
+include "C:/Users/jessa/Dropbox/Master2/Semester1/MCS/project/deel2/files/instances-and-testing/instances.idp"
 
 
 
