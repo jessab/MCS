@@ -186,14 +186,21 @@ procedure checkStrucs() {
 	io.stdout:setvbuf("no")
 	io.stderr:setvbuf("no")
 	local strucs={
-		{split, "split", 0 } ,
-		{invalidGold, "invalidGold", 0}, 
-		{cheater2, "cheater2", 0 } ,
-		{cheater3, "cheater3", 0 } ,
-		{winlose, "winlose", 0 } ,
-		{win, "win", 1 } ,
-		{lose, "lose", 1 } ,
-		{loseCrossing, "loseCrossing", 2 } ,
+//		{split, "split", 0 } ,
+//		{invalidGold, "invalidGold", 0}, 
+//		{cheater2, "cheater2", 0 } ,
+//		{cheater3, "cheater3", 0 } ,
+//		{winlose, "winlose", 0 } ,
+//		{win, "win", 1 } ,
+//		{lose, "lose", 1 } ,
+		{small, "small", 1},
+		{huge, "huge", 0},
+//		{loseCrossing, "loseCrossing", 2 } ,
+//		{loseCrossing2, "loseCrossing2", 1 } ,
+//		{winDeadEnd,"winDeadEnd",1},
+//		{noGoldLeft,"noGoldLeft",0},
+//		{noGoldLeft2,"noGoldLeft2",1},
+//		{moveTest, "moveTest",2}
 	}
 
 	myTheo = merge(PacmanTheory, TimeTheory)
@@ -211,6 +218,7 @@ procedure checkStrucs() {
 		else
 		 	modelsfound = #models
 		end
+		print(modelsfound)
 		if modelsfound > expected then
 			print(">>>>>>> Verification failed. Found too many models for", name)
 			printmodels(models)
@@ -223,6 +231,9 @@ procedure checkStrucs() {
 			end
 		else
 			print("Verification succeeded for", name)
+			if modelsfound > 0 then
+				printmodels(models)
+			end
 		end
 	end
 	

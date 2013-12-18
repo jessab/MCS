@@ -174,36 +174,6 @@ structure lose : PacmanVoc{
 	
 }
 
-structure loseCrossing : PacmanVoc{
-	time={0..2}
-	dir = {u;d;l;r}
-	Up=u
-	Down=d
-	Left=l
-	Right=r
-
-	xCo = {1..4}
-	yCo = {1..4}
-
-	pacman=p
-	agent={p; blinky; }
-
-	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
-	Position<ct> ={1,p,1,3}
-	Position<cf> ={1,blinky,1,3}
-
-	Wall = {2,2,d}
-	
-	GameLost<ct> ={1}
-	GameLost<cf> ={0}
-	Gold={0,1,3;1,1,3;2,1,3}
-
-	
-}
-
-
-
-
 
 structure small : PacmanVoc{
 	time={0..50}
@@ -274,4 +244,161 @@ structure huge : PacmanVoc{
 
 	I_gold<cf> = {2,3;2,8;5,1;5,10;6,5;6,6;7,5;7,6;8,1;9,1;8,10;9,10}
 	I_gold<u> ={8,5 ; }
+}
+
+structure loseCrossing : PacmanVoc{
+	time={0..2}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; blinky; }
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position<ct> ={1,p,1,3}
+	Position<cf> ={1,blinky,1,3}
+
+	Wall = {2,2,d}
+	
+	GameLost<ct> ={1}
+	GameLost<cf> ={0}
+	Gold={0,1,3;1,1,3;2,1,3}
+
+	
+}
+
+structure loseCrossing2 : PacmanVoc{
+	time={0..2}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; blinky; }
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position<ct> ={1,p,1,3;1,blinky,1,4;0,p,1,4;0,blinky,1,3}
+	Position<cf> ={1,blinky,1,3}
+
+	Wall = {2,2,d}
+	
+	GameLost<ct> ={1}
+	GameLost<cf> ={0}
+	Gold={0,1,3;1,1,3;2,1,3}
+
+	
+}
+
+structure winDeadEnd : PacmanVoc{
+	time={0..2}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; blinky; }
+
+	NoPos = {2,3;3,3;4,3;}
+	Position<ct> ={0,blinky,3,4;0,p,1,4;}
+	Move<ct> ={0,blinky,r;0,p,d}
+
+	Wall = {}
+//	
+//	GameWon<ct> ={1}
+//	GameWon<cf> ={0}
+	Gold={0,1,3;1,1,3;2,1,3}
+
+	
+}
+
+
+
+structure noGoldLeft : PacmanVoc{
+	//unsatisfiable
+	time={0..2}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; }
+	Move={0,p,u;0,Blinky,u;}
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position<ct> = {1,p,2,3}
+
+	Wall = {2,2,d}
+	
+	Gold<ct> ={1,2,2}
+}
+
+
+
+structure noGoldLeft2 : PacmanVoc{
+	//unsatisfiable
+	time={0..2}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p; Blinky; }
+	Move ={0,p,u;0,Blinky,u;}
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position<ct> = {1,p,2,3;1,Blinky,3,4}
+
+	Wall = {2,2,d}
+	
+	Gold={0,2,2}
+}
+
+
+structure moveTest : PacmanVoc{
+	//unsatisfiable
+	time={0..2}
+	dir = {u;d;l;r}
+	Up=u
+	Down=d
+	Left=l
+	Right=r
+
+	xCo = {1..4}
+	yCo = {1..4}
+
+	pacman=p
+	agent={p;}
+
+	NoPos = {1,1; 1,2; 4,1; 4,2; 4,3; }
+	Position<ct> = {1,p,3,3}
+
+	Wall = {2,2,d}
+	
+	Gold<ct> ={0,2,2}
 }
