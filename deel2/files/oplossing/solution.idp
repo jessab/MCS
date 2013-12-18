@@ -198,13 +198,13 @@ theory PacmanTheory:PacmanVoc{
 			!x[xCo] y[yCo] t[time] : Gold(Next(t),x,y) <- Gold(t,x,y) & ~Cn_gold(t,x,y).
         }
         {
-        	!a[agent] d[dir] t[time]: PreviousMove(Next(t),a,d) <- Move(t,a,d).// & time(t+1).
+        	!a[agent] d[dir] t[time]: PreviousMove(Next(t),a,d) <- Move(t,a,d).
         }
         {
-        	!t[time]: PrevLost(Next(t)) <- GameLost(t).// & time(t+1).
+        	!t[time]: PrevLost(Next(t)) <- GameLost(t). //C_prevLost weggelaten vanwege zo simpel dat het overbodig is
         }
         {
-        	!t[time]: PrevWon(Next(t)) <- GameWon(t).// & time(t+1).
+        	!t[time]: PrevWon(Next(t)) <- GameWon(t). //C_prevWon weggelaten vanwege zo simpel dat het overbodig is
         }
 
 		// Causes
@@ -300,6 +300,7 @@ procedure verification4proc(struc){
 			print("ok: Het is mogelijk het spel te verliezen")
 		else
 			print("nok: Het is onmogelijk het spel te verliezen")
+			printcore(TT, struc) 
 		end
 }
 
