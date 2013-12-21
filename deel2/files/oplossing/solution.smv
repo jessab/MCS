@@ -3,14 +3,14 @@ MODULE main
 		pacman : agent(0,4,FALSE,gameover);
 		ghost : agent(2,2,TRUE,gameover);
 		
-		sq1 : square(pacman, ghost,0, 0 ,FALSE ,TRUE ,TRUE ,FALSE );
-		sq2 : square(pacman, ghost,1, 0 ,TRUE ,TRUE ,FALSE ,FALSE );
-		sq3 : square(pacman, ghost,2, 0 ,FALSE ,TRUE ,FALSE ,TRUE );
+		sq1 : square(pacman, ghost,0, 1 ,FALSE ,TRUE ,TRUE ,FALSE );
+		sq2 : square(pacman, ghost,1, 1 ,TRUE ,TRUE ,FALSE ,FALSE );
+		sq3 : square(pacman, ghost,2, 1 ,FALSE ,TRUE ,FALSE ,TRUE );
 		sq4 : square(pacman, ghost,0, 2 ,FALSE ,FALSE ,TRUE ,TRUE );
 		sq5 : square(pacman, ghost,2, 2 ,FALSE ,FALSE ,TRUE ,TRUE );
 		sq6 : square(pacman, ghost,0, 3 ,FALSE ,FALSE ,TRUE ,FALSE );
 		sq7 : square(pacman, ghost,1, 3 ,FALSE ,TRUE ,FALSE ,FALSE );
-		sq8 : square(pacman, ghost,2, 3 ,FALSE ,FALSE ,FALSE ,TRUE );
+		sq8 : square(pacman, ghost,2, 3 ,TRUE ,FALSE ,FALSE ,TRUE );
 		sq9 : square(pacman, ghost,0, 4 ,TRUE ,FALSE ,TRUE ,FALSE );
 		sq10 : square(pacman, ghost,1,4 ,TRUE ,FALSE ,FALSE ,TRUE );
 						
@@ -18,18 +18,82 @@ MODULE main
 		gameover: boolean;
 	--TODO finish this module
 
-
+	ASSIGN
+		init(gameState) := playing;
+		
+		next(gameState) :=
+			case
+				pacman.x = ghost.x & pacman.y = ghost.y : LOSE;
+				!sq1.contains_coin & !sq2.contains_coin 
+				& !sq3.contains_coin & !sq4.contains_coin 
+				& !sq5.contains_coin & !sq6.contains_coin 
+				& !sq7.contains_coin & !sq8.contains_coin
+				& !sq9.contains_coin & !sq10.contains_coin : WIN;
+				TRUE : playing
+			esac;
+				
+	DEFINE
+		gameover = gameState = WIN | gameSate = LOSE;
 	
 	
-
-
+	--Vanuit elke begintoestand kan het spel zowel gewonnen als verloren worden.
+	SPEC (EF gameState = WIN & EF gameState = LOSE)
+	
+	--Muntjes kunnen niet terug verschijnen: als er ergens geen muntje ligt, dan zal in de toekomomst er nooit nog een muntje liggen.
+	--(check dit voor 1concreet vakje)
+	SPEC (!sq1.contains_coin -> G !sq1.contains_coin)
+	
+	--Het is mogelijk dat pacman oneindig vaak op locatie (1;1) is terwijl het spel nog bezig is.
+	SPEC ()
+	
+	--Als pacman oneindig vaak op locatie (1;1) komt en oneindig vaak op locatie (1;3) komt, dan wordt het spel nooit gewonnen.
+	SPEC()
+	
+	--Eens het spel verloren of gewonnen is, blijft het spel in deze toestand.
+	SPEC()
+	
+	--Er zijn minstens 10 tijdstappen nodig om het spel te winnen
+	SPEC()
+	
+	
 	
 --Represents a "walking object"
 -- it has a startposition (given by startX and startY), 
 -- a boolean isGhost that is true if this agent is a ghost, 
 -- and it knows whether the game is over (boolean gameover)
 MODULE agent(startX,startY,isGhost,gameover)
-	--TODO finish this module
+	VAR
+		x : 0..4;
+		y : 0..4;
+		direction : {up, down, left, right} -- TODO: Zorgen dat het niet in de richting van een muur is
+		
+	ASSIGN
+		init(x) := startX;
+		init(y) := startY;
+		
+		next(x):=
+			case
+				gameover : x;
+				direction = left : x-1;
+				direction = right : x+1;
+				TRUE: x;
+			esac;
+			
+		next(y):=
+			case
+				gameover : y;
+				direction = up : y+1;
+				direction = down : y-1;
+				TRUE: y;
+			esac;
+			
+		next(direction):= -- TODO: Zorgen dat het niet in de richting van een muur is
+			case
+				isGhost : {up, down, left, right} & !direction; -- TODO: notatie controleren
+				TRUE : {up, down, left, right};
+			esac;
+				
+		
 
 	
 
@@ -39,5 +103,17 @@ MODULE agent(startX,startY,isGhost,gameover)
 --x and y are its coordinates on the square
 MODULE square(pacman,ghost,x,y,u,d,l,r)
 	-- TODO do something here, probably related to coins ;-)
-	
+	VAR
+		contains_coin : boolean;
+		
+		
+	ASSIGN
+		-- init(contains_coin) := {TRUE, FALSE}; -- implied (remove in final version, just reminder for myself)
+		
+		next(contains_coin) :=
+			case
+				!contains_coin : FALSE;
+				pacman.x = x & pacman.y = y : contains_coin = FALSE;
+				TRUE : TRUE;
+			esac;
 	

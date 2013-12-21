@@ -42,10 +42,9 @@ vocabulary PacmanVoc{
         NoPos(xCo,yCo)
         Pos(xCo,yCo)
         Wall(xCo,yCo,dir)
-        IsWall(xCo,yCo,dir)
         OppositeDir(dir):dir
         Transition(dir,xCo,yCo,xCo,yCo)
-        Edge(xCo,yCo,xCo,yCo)
+        Edge(xCo,yCo,xCo,yCo,dir)
         Reach(xCo,yCo,xCo,yCo)
 
         // game winning
@@ -70,7 +69,7 @@ theory TimeTheory:PacmanVoc{
 
 theory PacmanTheory:PacmanVoc{
 	
-	// Invariabele definities
+	// Invariabele definities (syntactic sugar)
 	
         // OppositeDirection, uitdrukken dat twee richtingen elkaars tegengestelden zijn
         OppositeDir(Left)=Right.
@@ -89,15 +88,13 @@ theory PacmanTheory:PacmanVoc{
 		// Pos: Een positie waar wel een vakje is
         !x[xCo],y[yCo]:Pos(x,y)<=>~NoPos(x,y).
         
-        // Wall predicaat symmetrisch maken
+        // Edge definieren als 2 vakjes die direct bereikbaar zijn via elkaar
         {
-                !x[xCo],y[yCo],d[dir]: IsWall(x,y,d) <- Wall(x,y,d).
-                !x2[xCo],y2[yCo],d[dir]: IsWall(x2,y2,OppositeDir(d)) <- ?x1[xCo],y1[yCo]: IsWall(x1,y1,d) & Transition(d,x1,y1,x2,y2).
-        }
-        
-        {
-                ! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Edge(x1,y1,x2,y2) <- ? d[dir] :Transition(d,x1,y1,x2,y2) 
-													& ~IsWall(x1,y1,d) & Pos(x1,y1) & Pos(x2,y2).
+                ! x1[xCo],y1[yCo],x2[xCo],y2[yCo],d[dir] : Edge(x1,y1,x2,y2,d) <- //2 vakjes zijn onderling bereikbaar volgens een richting als:
+						Pos(x1,y1) & Pos(x2,y2)		//Beide vakjes betreedbare posities zijn,
+                		& Transition(d,x1,y1,x2,y2) //Ze naast elkaar liggen volgens die richting,
+                		& ~Wall(x1,y1,d)
+                		& ~Wall(x2,y2,OppositeDir(d)).
         }
 
 
@@ -109,11 +106,10 @@ theory PacmanTheory:PacmanVoc{
         {
                         // Een vakje dat deel is van het spel kan zichzelf bereiken
                 ! x[xCo],y[yCo] : Reach(x,y,x,y) <-Pos(x,y).
-                // Als 2 vakjes hetzelfde vakje kunnen bereiken, kunnen ze elkaar bereiken
-                ! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ?x3[xCo],y3[yCo]:Edge(x1,y1,x3,y3)&Reach(x3,y3,x2,y2).
+                // Als een vakje de direct bereikbare buur van een ander vakje kan bereiken, is dat vakje ook bereikbaar.
+                ! x1[xCo],y1[yCo],x2[xCo],y2[yCo] : Reach(x1,y1,x2,y2) <- ?x3[xCo],y3[yCo],d[dir]:Edge(x1,y1,x3,y3,d)&Reach(x3,y3,x2,y2).
         }
                 // Alle vakjes die deel zijn van het spel (Pos) kunnen elkaar bereiken
-        //!x1[xCo],y1[yCo],x2[xCo],y2[yCo]:Pos(x1,y1)&Pos(x2,y2)<=>Reach(x1,y1,x2,y2).
         ?x1[xCo],y1[yCo]: Pos(x1,y1) & (!x2[xCo],y2[yCo]:Pos(x2,y2)=>Reach(x1,y1,x2,y2)).
         
         
@@ -121,6 +117,9 @@ theory PacmanTheory:PacmanVoc{
      
         // Iedereen is op exact 1 plaats
         !t[time],a[agent]:#{x[xCo] y[yCo] : Position(t,a,x,y)}=1.
+        
+		// Iedereen kan hoogstens in 1 richting tegelijk bewegen
+        !t[time],a[agent]:#{d[dir] : Move(t,a,d)} < 2.
                                 
         // Niemand staat op plaatsen waar geen vakje is
         !t[time],a[agent],x[xCo],y[yCo]:Position(t,a,x,y)=>Pos(x,y).
@@ -128,19 +127,19 @@ theory PacmanTheory:PacmanVoc{
         // Er kan enkel goud liggen op plaatsen waar een vakje is
         !t[time],x[xCo],y[yCo] : Gold(t,x,y) => Pos(x,y).
         
-        // Niemand beweegt door muren
-        !t[time],x[xCo],y[yCo],a[agent],d[dir]:(IsWall(x,y,d)&Position(t,a,x,y)=>~Move(t,a,d)).
-        
-        // Niemand beweegt van het bord af
-        !t[time],a[agent],x1[xCo],y1[yCo],d[dir]:Position(t,a,x1,y1)&Move(t,a,d)=>?x2[xCo],y2[yCo]:Transition(d,x1,y1,x2,y2)&Pos(x2,y2).
-        
-        // Iedereen kan hoogstens in 1 richting tegelijk bewegen
-        !t[time],a[agent]:#{d[dir] : Move(t,a,d)} < 2.
+        //Niemand beweegt door muren of van het bord af. Maw, Er mag enkel tussen onderling direct bereikbare vakjes bewogen worden.
+        !t[time] x[xCo] y[yCo] a[agent] d[dir]: Move(t,a,d) & Position(t,a,x,y)=>
+        				?x1[xCo] y1[yCo]: Edge(x,y,x1,y1,d).
         
         // Ghosts kunnen niet omkeren
         ! t[time],a[agent],d [dir], prevD[dir] : a=pacman | ( Move(t,a,d) & PreviousMove(t,a,prevD)=>~prevD=OppositeDir(d)).
+ 
+ 
+ 		///////////////////////////
+ 		/// WIN/LOSE CONDITIONS ///
+ 		///////////////////////////
 
-        // GameLost als een ghost op hetzelfde vakje als pacman staat of ghost en pacman elkaar gekruisd zijn
+        // GAMELOST als een ghost op hetzelfde vakje als pacman staat of ghost en pacman elkaar gekruisd zijn
         !t[time]:Caught(t) //pacman en ghost op zelfde positie
         	| Crossed(t) // of ze zijn elkaar gekruisd
         	| PrevLost(t) // of het spel was al verloren
@@ -153,11 +152,11 @@ theory PacmanTheory:PacmanVoc{
     	!t[time] : Crossed(t) <=> ?a[agent] x1[xCo] y1[yCo] x2[xCo] y2[yCo] d[dir]: 
     		~a=pacman //pacman en spook
 			& Position(t,pacman,x1,y1) & Position(t,a,x2,y2) //staan op bepaalde positities op tijdstip t
-			& Transition(d,x1,y1,x2,y2) //De posities liggen naast elkaar volgens richting d
+			& Edge(x1,y1,x2,y2,d) //De posities liggen naast elkaar volgens richting d
     		& PreviousMove(t,pacman,OppositeDir(d)) & PreviousMove(t,a,d). // verwisselen van positie in volgend tijdstip
         
         
-        // GameWon als al het goud op is of een spook in een doodlopende gang zit en het spel niet verloren is
+        // GAMEWON als al het goud op is of een spook in een doodlopende gang zit en het spel niet verloren is
         !t[time]:(~GameLost(t)  // het spel is niet verloren
         	& (~ (? x[xCo],y[yCo] : Gold(t,x,y))  // er is geen goud meer
         		| DeadEnd(t))  // er zit een spook in een doodlopende gang
@@ -165,15 +164,16 @@ theory PacmanTheory:PacmanVoc{
         ) <=> GameWon(t). //Als aan de voorwaarden voor gameLost en gameWon voldaan is, dan is het ook verloren
                 
         // Doodlopende Gangen
-        !t[time] : DeadEnd(t) <=> ?a[agent] x[xCo] y[yCo] d[dir]:
-        	~a=pacman	//het is een geest
-        	& PreviousMove(t,a,d) //die net een stap in richting d gedaan heeft
-        	& ~(?d1[dir] x1[xCo] y1[yCo]: //Het volgende geval komt niet voor:
-        		~d1=OppositeDir(d)		  //er is een richting die niet de terugkeer richting is
-        		& Transition(d1,x,y,x1,y1)//het vakje x1y1 ligt in die richting
-        		& Edge(x,y,x1,y1)		  //en dat vakje is direct bereikbaar voor de geest.
-        	).
-                
+//        !t[time] : DeadEnd(t) <=> ?a[agent] x[xCo] y[yCo] d[dir]:
+//        	~a=pacman & Position(t,a,x,y)	//het is een geest op positie (x,y)
+//        	& PreviousMove(t,a,d) //die net een stap in richting d gedaan heeft
+//        	& ~(?d1[dir] x1[xCo] y1[yCo]: //Het volgende geval komt niet voor:
+//        		~d1=OppositeDir(d)		//er is een richting die niet de terugkeer richting is
+//        		& Edge(x,y,x1,y1,d1)	//en er in die richting een direct bereikbaar vakje ligt
+//        	).
+        !t[time] : DeadEnd(t) <=> ?a[agent] x[xCo] y[yCo]:
+        	~a=pacman & Position(t,a,x,y)	//het is een geest op positie (x,y)
+        	& #{d[dir],x1[xCo],y1[yCo]:Edge(x,y,x1,y1,d)}=1. //Er is maar 1 toegang tot die positie 
                 
         // GameEnded: Het spel is gedaan, het is verloren of gewonnen
         !t[time]:GameEnded(t)<=>GameLost(t)|GameWon(t).
@@ -209,7 +209,7 @@ theory PacmanTheory:PacmanVoc{
 
 		// Causes
         {   // Position     
-        	!a[agent] x[xCo] y[yCo] t[time] : C_position(t,a,x,y) <- ? x1[xCo] y1[yCo] d[dir]: Position(t,a,x1,y1) & Move(t,a,d) & Transition(d,x1,y1,x,y).
+        	!a[agent] x[xCo] y[yCo] t[time] : C_position(t,a,x,y) <- ? x1[xCo] y1[yCo] d[dir]: Position(t,a,x1,y1) & Move(t,a,d) & Edge(x1,y1,x,y,d).
         	!a[agent] x[xCo] y[yCo] t[time] : Cn_position(t,a,x,y) <- ?d[dir]: Position(t,a,x,y) & Move(t,a,d).
         }
         {	// Gold
