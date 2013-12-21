@@ -36,8 +36,26 @@ MODULE main
 		gameover = gameState = WIN | gameSate = LOSE;
 	
 	
-
-
+	--Vanuit elke begintoestand kan het spel zowel gewonnen als verloren worden.
+	SPEC (EF gameState = WIN & EF gameState = LOSE)
+	
+	--Muntjes kunnen niet terug verschijnen: als er ergens geen muntje ligt, dan zal in de toekomomst er nooit nog een muntje liggen.
+	--(check dit voor 1concreet vakje)
+	SPEC (!sq1.contains_coin -> G !sq1.contains_coin)
+	
+	--Het is mogelijk dat pacman oneindig vaak op locatie (1;1) is terwijl het spel nog bezig is.
+	SPEC ()
+	
+	--Als pacman oneindig vaak op locatie (1;1) komt en oneindig vaak op locatie (1;3) komt, dan wordt het spel nooit gewonnen.
+	SPEC()
+	
+	--Eens het spel verloren of gewonnen is, blijft het spel in deze toestand.
+	SPEC()
+	
+	--Er zijn minstens 10 tijdstappen nodig om het spel te winnen
+	SPEC()
+	
+	
 	
 --Represents a "walking object"
 -- it has a startposition (given by startX and startY), 
