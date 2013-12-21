@@ -222,8 +222,8 @@ theory verification1: PacmanVoc{
         // Te verifieren: Het aantal muntstukken op het bord kan enkel omlaag gaan
         // Contradictie: Voorwaarde toevoegen dat er een tijd bestaat waar het aantal muntstukken omhoog gaat
         
-        ?t1[time] t2[time] x[xCo] y[yCo]: t2>t1 & ~Gold(t1,x,y) & Gold(t2,x,y).        
-//        ?t[time] : #{x[xCo],y[yCo]:Gold(t,x,y)} < #{x[xCo],y[yCo]:Gold(Next(t),x,y)}.
+        ?t1[time] t2[time] x[xCo] y[yCo]: t2 = Next(t1) & ~Gold(t1,x,y) & Gold(t2,x,y).        
+//        ?t1[time] t2[time] : t2=Next(t1) & #{x[xCo],y[yCo]:Gold(t1,x,y)} < #{x[xCo],y[yCo]:Gold(t2,x,y)}.
 
 }
 
@@ -245,7 +245,7 @@ procedure verification1proc(struc){
 theory verification2: PacmanVoc{
         // Te verifieren: als het spel ten einde is, blijft het ten einde
         // Contradictie: Voorwaarde toevoegen dat het spel ten einde is en daarna niet meer
-        ?t1[time] t2[time] : GameEnded(t1) & ~GameEnded(t2) & t2>t1.
+        ?t1[time] t2[time] : GameEnded(t1) & ~GameEnded(t2) & t2=Next(t1).
 }
 
 procedure verification2proc(struc){
@@ -258,6 +258,7 @@ procedure verification2proc(struc){
         if #models > 0 then
 //		if sat(TT, struc) then
 			print("nok: Als het spel ten einde is, blijft dat niet per sé zo")
+			printmodels(models)
 		else
 			print("ok: als het spel ten einde is, blijft het ten einde")
 		end
