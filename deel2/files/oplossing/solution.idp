@@ -222,7 +222,9 @@ theory verification1: PacmanVoc{
         // Te verifieren: Het aantal muntstukken op het bord kan enkel omlaag gaan
         // Contradictie: Voorwaarde toevoegen dat er een tijd bestaat waar het aantal muntstukken omhoog gaat
         
-        ?t[time] : #{x[xCo],y[yCo]:Gold(t,x,y)} < #{x[xCo],y[yCo]:Gold(Next(t),x,y)}.
+        ?t1[time] t2[time] x[xCo] y[yCo]: t2>t1 & ~Gold(t1,x,y) & Gold(t2,x,y).        
+//        ?t[time] : #{x[xCo],y[yCo]:Gold(t,x,y)} < #{x[xCo],y[yCo]:Gold(Next(t),x,y)}.
+
 }
 
 procedure verification1proc(struc){
