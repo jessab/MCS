@@ -30,8 +30,6 @@ vocabulary PacmanVoc{
 	/*Eigen predicaten/functies */
 	OppositeDir(dir):dir
 	Transition(dir,xCo,yCo,xCo,yCo)
-	//TransX(xCo,dir):xCo
-	//TransY(yCo,dir):yCo
 	Pos(xCo,yCo)
 	IsWall(xCo,yCo,dir)
 	Reach(xCo,yCo,xCo,yCo)

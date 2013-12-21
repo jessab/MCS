@@ -255,7 +255,7 @@ procedure verification2proc(struc){
 		local models = modelexpand(TT, struc)
         if #models > 0 then
 //		if sat(TT, struc) then
-			print("nok: Als het spel ten einde is, blijft dat niet per sé zo")
+			print("nok: Als het spel ten einde is, blijft dat niet per sï¿½ zo")
 		else
 			print("ok: als het spel ten einde is, blijft het ten einde")
 		end
@@ -295,7 +295,7 @@ procedure verification4proc(struc){
         TT = merge(T,verification4)
         nbmodels = 1
 		local models = modelexpand(TT, struc)
-        if #models > 0 then
+        if 0<#models then
 //		if sat(TT, struc) then
 			print("ok: Het is mogelijk het spel te verliezen")
 		else
