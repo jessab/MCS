@@ -232,10 +232,7 @@ procedure verification1proc(struc){
         //At least print whether the verification is satisified or not.
 	    T = merge(TimeTheory,PacmanTheory)
         TT = merge(T,verification1)
-        nbmodels = 1
-		local models = modelexpand(TT, struc)
-        if #models > 0 then
-//		if sat(TT, struc) then
+		if sat(TT, struc) then
 			print("nok: het aantal muntstukken op een bord kan stijgen")
 		else
 			print("ok: het aantal muntstukken op een bord kan enkel omlaag gaan")
@@ -253,10 +250,7 @@ procedure verification2proc(struc){
         //At least print whether the verification is satisified or not.
 	    T = merge(TimeTheory,PacmanTheory)
         TT = merge(T,verification2)
-        nbmodels = 1
-		local models = modelexpand(TT, struc)
-        if #models > 0 then
-//		if sat(TT, struc) then
+		if sat(TT, struc) then
 			print("nok: Als het spel ten einde is, blijft dat niet per sé zo")
 			printmodels(models)
 		else
@@ -275,10 +269,7 @@ procedure verification3proc(struc){
         //At least print whether the verification is satisified or not.
 	    T = merge(TimeTheory,PacmanTheory)
         TT = merge(T,verification3)
-        nbmodels = 1
-		local models = modelexpand(TT, struc)
-        if #models > 0 then
-//		if sat(TT, struc) then
+		if sat(TT, struc) then
 			print("ok: Het is mogelijk het spel te winnen")
 		else
 			print("nok: Het is onmogelijk het spel te winnen")
@@ -296,10 +287,7 @@ procedure verification4proc(struc){
         //At least print whether the verification is satisified or not.
 	    T = merge(TimeTheory,PacmanTheory)
         TT = merge(T,verification4)
-        nbmodels = 1
-		local models = modelexpand(TT, struc)
-        if #models > 0 then
-//		if sat(TT, struc) then
+		if sat(TT, struc) then
 			print("ok: Het is mogelijk het spel te verliezen")
 		else
 			print("nok: Het is onmogelijk het spel te verliezen")
