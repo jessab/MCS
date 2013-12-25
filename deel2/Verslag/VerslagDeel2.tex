@@ -43,6 +43,8 @@ De eerste twee verificaties zijn voorwaarden waar altijd, in alle mogelijke mode
 
 De laatste twee verificaties stellen dat er een model moet bestaan waarin aan een voorwaarde voldaan is. Om dit te controleren wordt de voorwaarde toegevoegd en nagegaan of er een model voor bestaat. Het verschil tussen de eerste twee verificaties en de laatste twee is dat het bij de eerste in alle modellen voldaan moet zijn en in de laatste in minimum 1 model.
 
+De eerste verificatie (het aantal muntstukken op het bord kan enkel omlaag gaan) gebeurd door de voorwaarde toe te voegen dat er een op een tijdstip geen goud ligt op een vakje en op een later tijdstip wel. Dit werd verkozen boven de letterlijke vertaling van de opgave omdat het het strikter (muntstukken kunnen ook niet van vakje veranderen) en performanter is. Deze striktere voorwaarde impliceert wel dat het aantal muntstukken op het bord enkel omlaag kan gaan.
+
 
 
 \section{NuSMV}
@@ -50,9 +52,9 @@ De laatste twee verificaties stellen dat er een model moet bestaan waarin aan ee
 \section{Tijdsbesteding}
 \begin{tabular}{l l l}
 Jessa: 	& IDP 	& 10u\\
-		& NuSMV & ?\\
+		& NuSMV 	& 2u\\
 Karel: 	& IDP 	& ?\\
-		& NuSMV & ?\\
+		& NuSMV 	& ?\\
 \end{tabular}
 
 \section{Besluit}
