@@ -3,19 +3,19 @@ MODULE main
 		pacman : agent(0,4,FALSE,gameover);
 		ghost : agent(2,2,TRUE,gameover);
 		
+--		      square(pacman, ghost,x, y,   u,     d,     l,      r)
 		sq1 : square(pacman, ghost,0, 1 ,FALSE ,TRUE ,TRUE ,FALSE );
-		sq2 : square(pacman, ghost,1, 1 ,TRUE ,TRUE ,FALSE ,FALSE );
-		sq3 : square(pacman, ghost,2, 1 ,FALSE ,TRUE ,FALSE ,TRUE );
-		sq4 : square(pacman, ghost,0, 2 ,FALSE ,FALSE ,TRUE ,TRUE );
-		sq5 : square(pacman, ghost,2, 2 ,FALSE ,FALSE ,TRUE ,TRUE );
-		sq6 : square(pacman, ghost,0, 3 ,FALSE ,FALSE ,TRUE ,FALSE );
-		sq7 : square(pacman, ghost,1, 3 ,FALSE ,TRUE ,FALSE ,FALSE );
-		sq8 : square(pacman, ghost,2, 3 ,TRUE ,FALSE ,FALSE ,TRUE );
-		sq9 : square(pacman, ghost,0, 4 ,TRUE ,FALSE ,TRUE ,FALSE );
-		sq10 : square(pacman, ghost,1,4 ,TRUE ,FALSE ,FALSE ,TRUE );
+ 		sq2 : square(pacman, ghost,1, 1 ,TRUE ,TRUE ,FALSE ,FALSE );
+ 		sq3 : square(pacman, ghost,2, 1 ,FALSE ,TRUE ,FALSE ,TRUE );
+ 		sq4 : square(pacman, ghost,0, 2 ,FALSE ,FALSE ,TRUE ,TRUE );
+ 		sq5 : square(pacman, ghost,2, 2 ,FALSE ,FALSE ,TRUE ,TRUE );
+ 		sq6 : square(pacman, ghost,0, 3 ,FALSE ,FALSE ,TRUE ,FALSE );
+ 		sq7 : square(pacman, ghost,1, 3 ,FALSE ,TRUE ,FALSE ,FALSE );
+ 		sq8 : square(pacman, ghost,2, 3 ,TRUE ,FALSE ,FALSE ,TRUE );
+ 		sq9 : square(pacman, ghost,0, 4 ,TRUE ,FALSE ,TRUE ,FALSE );
+ 		sq10 : square(pacman, ghost,1,4 ,TRUE ,FALSE ,FALSE ,TRUE );
 						
 		gameState : {WIN,LOSE,playing};
-		gameover: boolean;
 	--TODO finish this module
 
 	ASSIGN
@@ -29,11 +29,11 @@ MODULE main
 				& !sq5.contains_coin & !sq6.contains_coin 
 				& !sq7.contains_coin & !sq8.contains_coin
 				& !sq9.contains_coin & !sq10.contains_coin : WIN;
-				TRUE : playing
+				TRUE : playing;
 			esac;
 				
 	DEFINE
-		gameover = gameState = WIN | gameSate = LOSE;
+		gameover := gameState = WIN | gameState = LOSE;
 	
 	
 	--Vanuit elke begintoestand kan het spel zowel gewonnen als verloren worden.
@@ -41,19 +41,19 @@ MODULE main
 	
 	--Muntjes kunnen niet terug verschijnen: als er ergens geen muntje ligt, dan zal in de toekomomst er nooit nog een muntje liggen.
 	--(check dit voor 1concreet vakje)
-	SPEC (!sq1.contains_coin -> G !sq1.contains_coin)
+--	SPEC (!sq1.contains_coin -> G !sq1.contains_coin)
 	
 	--Het is mogelijk dat pacman oneindig vaak op locatie (1;1) is terwijl het spel nog bezig is.
-	SPEC ()
+--	SPEC ()
 	
 	--Als pacman oneindig vaak op locatie (1;1) komt en oneindig vaak op locatie (1;3) komt, dan wordt het spel nooit gewonnen.
-	SPEC()
+--	SPEC()
 	
 	--Eens het spel verloren of gewonnen is, blijft het spel in deze toestand.
-	SPEC()
+--	SPEC()
 	
 	--Er zijn minstens 10 tijdstappen nodig om het spel te winnen
-	SPEC()
+--	SPEC()
 	
 	
 	
@@ -65,8 +65,8 @@ MODULE agent(startX,startY,isGhost,gameover)
 	VAR
 		x : 0..4;
 		y : 0..4;
-		direction : {up, down, left, right} -- TODO: Zorgen dat het niet in de richting van een muur is
-		
+		direction : {up, down, left, right}; -- TODO: Zorgen dat het niet in de richting van een muur is
+	
 	ASSIGN
 		init(x) := startX;
 		init(y) := startY;
@@ -74,22 +74,25 @@ MODULE agent(startX,startY,isGhost,gameover)
 		next(x):=
 			case
 				gameover : x;
-				direction = left : x-1;
-				direction = right : x+1;
+				direction = left & 0 < x: (x - 1);
+				direction = right & x < 4 : (x + 1);
 				TRUE: x;
 			esac;
 			
 		next(y):=
 			case
 				gameover : y;
-				direction = up : y+1;
-				direction = down : y-1;
+				direction = up & y < 4: (y + 1);
+				direction = down & 0 < y: (y - 1);
 				TRUE: y;
 			esac;
 			
 		next(direction):= -- TODO: Zorgen dat het niet in de richting van een muur is
 			case
-				isGhost : {up, down, left, right} & !direction; -- TODO: notatie controleren
+				isGhost & direction = up : {down, left, right};
+				isGhost & direction = down : {up,left,right};
+				isGhost & direction = left : {up,down,right};
+				isGhost & direction = right : {up,down,left};
 				TRUE : {up, down, left, right};
 			esac;
 				
@@ -106,6 +109,19 @@ MODULE square(pacman,ghost,x,y,u,d,l,r)
 	VAR
 		contains_coin : boolean;
 		
+	DEFINE
+		pacmanHere := pacman.x = x & pacman.y = y;
+		ghostHere := ghost.x = x & ghost.y = y;
+		
+	INVAR pacmanHere & u -> pacman.direction != up;
+	INVAR pacmanHere & d -> pacman.direction != down;
+	INVAR pacmanHere & l -> pacman.direction != left;
+	INVAR pacmanHere & r -> pacman.direction != right;
+	
+	INVAR ghostHere & u -> ghost.direction != up;
+	INVAR ghostHere & d -> ghost.direction != down;
+	INVAR ghostHere & l -> ghost.direction != left;
+	INVAR ghostHere & r -> ghost.direction != right;
 		
 	ASSIGN
 		-- init(contains_coin) := {TRUE, FALSE}; -- implied (remove in final version, just reminder for myself)
@@ -116,4 +132,4 @@ MODULE square(pacman,ghost,x,y,u,d,l,r)
 				pacman.x = x & pacman.y = y : contains_coin = FALSE;
 				TRUE : TRUE;
 			esac;
-	
+				
