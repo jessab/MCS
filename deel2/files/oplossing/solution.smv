@@ -2,6 +2,7 @@ MODULE main
 	VAR 
 		pacman : agent(0,4,FALSE,gameover);
 		ghost : agent(2,2,TRUE,gameover);
+		countDown : 0..10;
 		
 --		      square(pacman, ghost,x, y,   u,     d,     l,      r)
 		sq1 : square(pacman, ghost,0, 1 ,FALSE ,TRUE ,TRUE ,FALSE );
@@ -16,9 +17,14 @@ MODULE main
  		sq10 : square(pacman, ghost,1,4 ,TRUE ,FALSE ,FALSE ,TRUE );
 						
 --		gameState : {WIN,LOSE,playing};
-	--TODO finish this module
 
 	ASSIGN
+		init(countDown) := 10;
+		next(countDown) := case
+								0<countDown : countDown - 1;
+								TRUE : 0;
+							esac;
+	
 --		init(gameState) := playing;
 --		
 --		next(gameState) :=
@@ -33,8 +39,9 @@ MODULE main
 --			esac;
 				
 	DEFINE
-		lost := pacman.x = ghost.x & pacman.y = ghost.y;
-		won := !sq1.contains_coin & !sq2.contains_coin 
+		lost := (pacman.x = ghost.x) & (pacman.y = ghost.y);
+		won := !lost
+				& !sq1.contains_coin & !sq2.contains_coin 
 				& !sq3.contains_coin & !sq4.contains_coin 
 				& !sq5.contains_coin & !sq6.contains_coin 
 				& !sq7.contains_coin & !sq8.contains_coin
@@ -42,27 +49,32 @@ MODULE main
 		gameover := won | lost;
 	
 	
+	--Pacman is altijd op een gedefinieerde square
+	LTLSPEC G (sq1.pacmanHere | sq2.pacmanHere | sq3.pacmanHere | sq4.pacmanHere | sq5.pacmanHere | 
+		sq6.pacmanHere | sq7.pacmanHere | sq8.pacmanHere | sq9.pacmanHere | sq10.pacmanHere)
+	
 	--Vanuit elke begintoestand kan het spel zowel gewonnen als verloren worden.
---	SPEC (EF gameState = WIN & EF gameState = LOSE);
-	SPEC (EF won);
-	SPEC (EF lost);
+	CTLSPEC !(AX lost) -> (EF won)
+	CTLSPEC (EF lost)
 	
 	--Muntjes kunnen niet terug verschijnen: als er ergens geen muntje ligt, dan zal in de toekomomst er nooit nog een muntje liggen.
 	--(check dit voor 1concreet vakje)
---	SPEC (!sq1.contains_coin -> G !sq1.contains_coin)
+	SPEC (!sq1.contains_coin -> AX !sq1.contains_coin)
 	
 	--Het is mogelijk dat pacman oneindig vaak op locatie (1;1) is terwijl het spel nog bezig is.
---	SPEC (A (EF (pacman.x = 1 & pacman.y = 1)  gameover));
-	SPEC EG (EF (pacman.x = 1 & pacman.y = 1))
+	CTLSPEC EG (EF (pacman.x = 1 & pacman.y = 1))
 	
 	--Als pacman oneindig vaak op locatie (1;1) komt en oneindig vaak op locatie (1;3) komt, dan wordt het spel nooit gewonnen.
---	SPEC()
+	LTLSPEC G ((F (pacman.x = 1 & pacman.y = 1)) & (F (pacman.x = 1 & pacman.y = 3))) -> G !won
 	
 	--Eens het spel verloren of gewonnen is, blijft het spel in deze toestand.
---	SPEC()
+--	CTLSPEC AG (won -> AX won)
+	LTLSPEC (X won -> won)
+	CTLSPEC AG (lost -> AX lost)
 	
 	--Er zijn minstens 10 tijdstappen nodig om het spel te winnen
---	SPEC()
+--	CTLSPEC AG ( won -> countDown = 0)
+	LTLSPEC G ( won -> countDown = 0)
 	
 	
 	
@@ -131,6 +143,9 @@ MODULE square(pacman,ghost,x,y,u,d,l,r)
 	INVAR ghostHere & d -> ghost.direction != down;
 	INVAR ghostHere & l -> ghost.direction != left;
 	INVAR ghostHere & r -> ghost.direction != right;
+	
+	--Muntjes kunnen niet terug verschijnen: als er ergens geen muntje ligt, dan zal in de toekomomst er nooit nog een muntje liggen.
+--	SPEC AG (!contains_coin -> AX !contains_coin)
 		
 	ASSIGN
 		-- init(contains_coin) := {TRUE, FALSE}; -- implied (remove in final version, just reminder for myself)
@@ -139,7 +154,7 @@ MODULE square(pacman,ghost,x,y,u,d,l,r)
 		next(contains_coin) :=
 			case
 				!contains_coin : FALSE;
-				pacman.x = x & pacman.y = y : contains_coin = FALSE;
+				pacman.x = x & pacman.y = y : FALSE;
 				TRUE : TRUE;
 			esac;
 				
