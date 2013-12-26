@@ -2,7 +2,7 @@ MODULE main
 	VAR 
 		pacman : agent(0,4,FALSE,gameover);
 		ghost : agent(2,2,TRUE,gameover);
-		countDown : 0..10;
+		countDown : 0..9;
 		
 --		      square(pacman, ghost,x, y,   u,     d,     l,      r)
 		sq1 : square(pacman, ghost,0, 1 ,FALSE ,TRUE ,TRUE ,FALSE );
@@ -19,7 +19,7 @@ MODULE main
 --		gameState : {WIN,LOSE,playing};
 
 	ASSIGN
-		init(countDown) := 10;
+		init(countDown) := 9;
 		next(countDown) := case
 								0<countDown : countDown - 1;
 								TRUE : 0;
@@ -55,6 +55,7 @@ MODULE main
 	
 	--Vanuit elke begintoestand kan het spel zowel gewonnen als verloren worden.
 	CTLSPEC !(AX lost) -> (EF won)
+--	CTLSPEC (EF won)
 	CTLSPEC (EF lost)
 	
 	--Muntjes kunnen niet terug verschijnen: als er ergens geen muntje ligt, dan zal in de toekomomst er nooit nog een muntje liggen.
@@ -149,12 +150,12 @@ MODULE square(pacman,ghost,x,y,u,d,l,r)
 		
 	ASSIGN
 		-- init(contains_coin) := {TRUE, FALSE}; -- implied (remove in final version, just reminder for myself)
-		init(contains_coin) := TRUE;
+		init(contains_coin) := !pacmanHere;
 		
 		next(contains_coin) :=
 			case
 				!contains_coin : FALSE;
-				pacman.x = x & pacman.y = y : FALSE;
+				next(pacman.x) = x & next(pacman.y = y) : FALSE;
 				TRUE : TRUE;
 			esac;
 				
