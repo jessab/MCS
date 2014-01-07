@@ -15,8 +15,6 @@ MODULE main
  		sq8 : square(pacman, ghost,2, 3 ,TRUE ,FALSE ,FALSE ,TRUE );
  		sq9 : square(pacman, ghost,0, 4 ,TRUE ,FALSE ,TRUE ,FALSE );
  		sq10 : square(pacman, ghost,1,4 ,TRUE ,FALSE ,FALSE ,TRUE );
-						
---		gameState : {WIN,LOSE,playing};
 
 	ASSIGN
 		init(countDown) := 9;
@@ -24,19 +22,6 @@ MODULE main
 								0<countDown : countDown - 1;
 								TRUE : 0;
 							esac;
-	
---		init(gameState) := playing;
---		
---		next(gameState) :=
---			case
---				pacman.x = ghost.x & pacman.y = ghost.y : LOSE;
---				!sq1.contains_coin & !sq2.contains_coin 
---				& !sq3.contains_coin & !sq4.contains_coin 
---				& !sq5.contains_coin & !sq6.contains_coin 
---				& !sq7.contains_coin & !sq8.contains_coin
---				& !sq9.contains_coin & !sq10.contains_coin : WIN;
---				TRUE : playing;
---			esac;
 				
 	DEFINE
 		lost := (pacman.x = ghost.x) & (pacman.y = ghost.y);
@@ -55,7 +40,6 @@ MODULE main
 	
 	--Vanuit elke begintoestand kan het spel zowel gewonnen als verloren worden.
 	CTLSPEC !(AX lost) -> (EF won)
---	CTLSPEC (EF won)
 	CTLSPEC (EF lost)
 	
 	--Muntjes kunnen niet terug verschijnen: als er ergens geen muntje ligt, dan zal in de toekomomst er nooit nog een muntje liggen.
@@ -111,10 +95,10 @@ MODULE agent(startX,startY,isGhost,gameover)
 			
 		next(direction):=
 			case
-				isGhost & direction = up : {down, left, right};
-				isGhost & direction = down : {up,left,right};
-				isGhost & direction = left : {up,down,right};
-				isGhost & direction = right : {up,down,left};
+				isGhost & direction = up : {up, left, right};
+				isGhost & direction = down : {down,left,right};
+				isGhost & direction = left : {up,down,left};
+				isGhost & direction = right : {up,down,right};
 				TRUE : {up, down, left, right};
 			esac;
 				
@@ -127,7 +111,6 @@ MODULE agent(startX,startY,isGhost,gameover)
 --pacman and ghost are the unique player and ghost 
 --x and y are its coordinates on the square
 MODULE square(pacman,ghost,x,y,u,d,l,r)
-	-- TODO do something here, probably related to coins ;-)
 	VAR
 		contains_coin : boolean;
 		
@@ -149,7 +132,6 @@ MODULE square(pacman,ghost,x,y,u,d,l,r)
 --	SPEC AG (!contains_coin -> AX !contains_coin)
 		
 	ASSIGN
-		-- init(contains_coin) := {TRUE, FALSE}; -- implied (remove in final version, just reminder for myself)
 		init(contains_coin) := !pacmanHere;
 		
 		next(contains_coin) :=
