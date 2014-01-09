@@ -2,7 +2,8 @@ MODULE main
 	VAR 
 		pacman : agent(0,4,FALSE,gameover);
 		ghost : agent(2,2,TRUE,gameover);
-		countDown : 0..9;
+--		countDown : 0..9;
+		lost : boolean;
 		
 --		      square(pacman, ghost,x, y,   u,     d,     l,      r)
 		sq1 : square(pacman, ghost,0, 1 ,FALSE ,TRUE ,TRUE ,FALSE );
@@ -17,14 +18,34 @@ MODULE main
  		sq10 : square(pacman, ghost,1,4 ,TRUE ,FALSE ,FALSE ,TRUE );
 
 	ASSIGN
-		init(countDown) := 9;
-		next(countDown) := case
-								0<countDown : countDown - 1;
-								TRUE : 0;
-							esac;
+--		init(countDown) := 9;
+--		next(countDown) := case
+--								0<countDown : countDown - 1;
+--								TRUE : 0;
+--							esac;
+		
+--		Also lose when pacman and the ghost cross each other
+		init(lost) := FALSE;					
+		next(lost) := case
+		    (next(pacman.x) = next(ghost.x)) 
+		  	& (next(pacman.y) = next(ghost.y)) : TRUE;
+		  	(pacman.x+1 = ghost.x & pacman.y = ghost.y
+		  		& pacman.direction = right 
+		  		& ghost.direction = left) : TRUE;
+		  	(ghost.x+1 = pacman.x & pacman.y = ghost.y
+		  		& ghost.direction = right 
+		  		& pacman.direction = left) : TRUE;
+		  	(pacman.y+1 = ghost.y & pacman.x = ghost.x
+		  		& pacman.direction = up 
+		  		& ghost.direction = down) : TRUE;
+		  	(ghost.y+1 = pacman.y & pacman.x = ghost.x
+		  		& ghost.direction = up 
+		  		& pacman.direction = down) : TRUE;
+		  	TRUE : lost;
+			esac;
 				
 	DEFINE
-		lost := (pacman.x = ghost.x) & (pacman.y = ghost.y);
+--		lost := (pacman.x = ghost.x) & (pacman.y = ghost.y);
 		won := !lost
 				& !sq1.contains_coin & !sq2.contains_coin 
 				& !sq3.contains_coin & !sq4.contains_coin 
@@ -58,8 +79,10 @@ MODULE main
 	CTLSPEC AG (lost -> AX lost)
 	
 	--Er zijn minstens 10 tijdstappen nodig om het spel te winnen
+	CTLSPEC ! EX EX (EX EX EX (EX EX EX won))
+--	LTLSPEC X X (X X X (X X X !won))
 --	CTLSPEC AG ( won -> countDown = 0)
-	LTLSPEC G ( won -> countDown = 0)
+--	LTLSPEC G ( won -> countDown = 0)
 	
 	
 	
