@@ -58,12 +58,12 @@ De eerste verificatie (het aantal muntstukken op het bord kan enkel omlaag gaan)
 Pacman en ghost bevinden zich in een co\"ordinaten systeem.
 Bij elke stap verandert of $ x $ of $ y $ met $ 1 $
 maar ter beperking van het aantal mogelijke toestanden, is $ 4 $ de maximale waarde voor beide.
-Dit zou zonder problemen naar een willekeurig getal groter dan $ 4 $ verhoogd kunnen worden.
+Dit zou zonder problemen naar een willekeurig getal groter dan $ 4 $ opgehoogd kunnen worden.
 
 Om te voorkomen dat ghost rechtsomkeer maakt, 
 en om muren ondoordringbaar te maken,
 werd aan \texttt{agent} instanties een variabele \texttt{direction} toegevoegd.
-In combinatie met de huidige co\"ordinaten bepaalt deze volledig en deterministisch de volgende positie van de \texttt{agent}.
+In combinatie met de huidige co\"ordinaten bepaald deze volledig en deterministisch de volgende positie van de \texttt{agent}.
 Daarom kan de volgende \texttt{direction} van een \texttt{agent} die ghost is,
 niet het tegengestelde van de huidige richting zijn, vandaar de parameter \texttt{isGhost}.
 
@@ -74,8 +74,8 @@ Ook dit verklaart waarom een \texttt{square} bij creatie verwijzingen krijgt naa
 
 \subsubsection{Coins}
 De variabele \texttt{contains\_coin} bepaalt of er op een \texttt{square} nog goud ligt.
-Bij het begin van het spel ligt overal behalve waar pacman start goud.
-In elke volgende toestand verdwijnt het goud op een vakje als pacman tijdens die beurt daar zal staan.
+Bij het begin van het spel ligt overal behalve waar pacman staat goud.
+In elke volgende toestand verdwijnt het goud op een vakje als pacman in die toestand daar zal staan.
 Daarnaast verandert de variabele \texttt{contains\_coin} niet.
 
 \subsubsection{GameState}
@@ -99,16 +99,7 @@ Bij het winnen moet de extra voorwaarde opgelegd worden dat hij niet in de volge
 Het is namelijk zo dat de keuze van \texttt{direction} al deterministisch bepaalt of dat zal gebeuren.
 
 Wanneer op het eerste vakje geen muntje ligt, zal er daar in alle volgende toestanden daar geen munt liggen.
-Omdat vakjes steeds zeer algemeen beschreven werden, is dit voldoende om hetzelfde voor alle vakjes te garanderen.
-
-Om oneindig vaak op hetzelfde vakje te komen,
-moet er een uitvoering van het spel zijn waarin er voor elke toestand nog een latere toestand volgt 
-zodat pacman opnieuw dat vakje bereikt.
-
-Op een gelijkaardige manier impliceren oneindig veel bezoeken aan twee verschillende vakjes,
-dat het spel in elke toestand niet gewonnen is.
-
-Tot slot zijn er minstens $ 10 $ tijdstappen nodig als het spel in elke $ 9^{de} $ toestand nog niet gewonnen is.
+Omdat vakjes steeds zeer algemeen beschreven werden is dit voldoende om hetzelfde voor alle vakjes te garanderen.
 
 \section{Tijdsbesteding}
 \begin{tabular}{l l l}

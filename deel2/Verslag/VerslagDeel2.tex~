@@ -99,7 +99,7 @@ Bij het winnen moet de extra voorwaarde opgelegd worden dat hij niet in de volge
 Het is namelijk zo dat de keuze van \texttt{direction} al deterministisch bepaalt of dat zal gebeuren.
 
 Wanneer op het eerste vakje geen muntje ligt, zal er daar in alle volgende toestanden daar geen munt liggen.
-Omdat vakjes steeds zeer algemeen beschreven werden, is dit voldoende om hetzelfde voor alle vakjes te garanderen.
+Omdat vakjes steeds zeer algemeen beschreven werden is dit voldoende om hetzelfde voor alle vakjes te garanderen.
 
 Om oneindig vaak op hetzelfde vakje te komen,
 moet er een uitvoering van het spel zijn waarin er voor elke toestand nog een latere toestand volgt 
