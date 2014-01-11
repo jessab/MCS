@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2013.11.11)  10 JAN 2014 23:56
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2013.11.11)  11 JAN 2014 11:56
 entering extended mode
 **C:/Users/jessa/Dropbox/Master2/Semester1/MCS/project/deel2/Verslag/VerslagDee
 l2.tex
@@ -561,20 +561,20 @@ Package biblatex Warning: 'babel/polyglossia' detected but 'csquotes' missing.
 
 (C:\Users\jessa\Dropbox\Master2\Semester1\MCS\project\deel2\Verslag\VerslagDeel
 2.aux)
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
 
 (C:\Users\jessa\AppData\Roaming\MiKTeX\2.9\tex\context\base\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -591,7 +591,7 @@ LaTeX Font Info:    ... okay on input line 23.
 \everyMPtoPDFconversion=\toks25
 )
 \AtBeginShipoutBox=\box31
-Package hyperref Info: Link coloring OFF on input line 23.
+Package hyperref Info: Link coloring OFF on input line 25.
  ("C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\nameref.sty"
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
 
@@ -600,9 +600,9 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count286
 )
-LaTeX Info: Redefining \ref on input line 23.
-LaTeX Info: Redefining \pageref on input line 23.
-LaTeX Info: Redefining \nameref on input line 23.
+LaTeX Info: Redefining \ref on input line 25.
+LaTeX Info: Redefining \pageref on input line 25.
+LaTeX Info: Redefining \nameref on input line 25.
 
 (C:\Users\jessa\Dropbox\Master2\Semester1\MCS\project\deel2\Verslag\VerslagDeel
 2.out)
@@ -622,47 +622,49 @@ Package biblatex Info: ... file 'VerslagDeel2.bbl' found.
 
 (C:\Users\jessa\Dropbox\Master2\Semester1\MCS\project\deel2\Verslag\VerslagDeel
 2.bbl)
-Package biblatex Info: Reference section=0 on input line 23.
-Package biblatex Info: Reference segment=0 on input line 23.
-LaTeX Font Info:    Try loading font information for U+msa on input line 25.
+Package biblatex Info: Reference section=0 on input line 25.
+Package biblatex Info: Reference segment=0 on input line 25.
+LaTeX Font Info:    Try loading font information for U+msa on input line 27.
  ("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 25.
+LaTeX Font Info:    Try loading font information for U+msb on input line 27.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd"
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
-{C:/Users/jessa/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}] [2]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 62.
- [3]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 62.
+{C:/Users/jessa/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}] [2] [3]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 123.
+ [4]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 123.
 
 (C:\Users\jessa\Dropbox\Master2\Semester1\MCS\project\deel2\Verslag\VerslagDeel
 2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 62.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 62.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 123.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 123.
 Package rerunfilecheck Info: File `VerslagDeel2.out' has not changed.
-(rerunfilecheck)             Checksum: C8D3DA3E6D85E431B79AD377A5753915;420.
+(rerunfilecheck)             Checksum: E62FFA44967F173E70958226D86321B7;760.
 Package logreq Info: Writing requests to 'VerslagDeel2.run.xml'.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 62.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 123.
  ) 
 Here is how much of TeX's memory you used:
- 12258 strings out of 493921
- 189174 string characters out of 3147281
+ 12271 strings out of 493921
+ 189393 string characters out of 3147281
  389423 words of memory out of 3000000
- 15387 multiletter control sequences out of 15000+200000
- 12265 words of font info for 48 fonts, out of 3000000 for 9000
+ 15394 multiletter control sequences out of 15000+200000
+ 12572 words of font info for 49 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 37i,6n,39p,1315b,1392s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 37i,7n,39p,1125b,1392s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Pr
-ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Fil
-es/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTeX
- 2.9/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on VerslagDeel2.pdf (3 pages, 63561 bytes).
+ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Program Fi
+les/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Program Files/MiKTe
+X 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/fon
+ts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/
+public/amsfonts/cm/cmtt12.pfb>
+Output written on VerslagDeel2.pdf (4 pages, 91201 bytes).
 PDF statistics:
- 70 PDF objects out of 1000 (max. 8388607)
- 12 named destinations out of 1000 (max. 500000)
- 65 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 103 PDF objects out of 1000 (max. 8388607)
+ 18 named destinations out of 1000 (max. 500000)
+ 105 words of extra memory for PDF output out of 10000 (max. 10000000)
 

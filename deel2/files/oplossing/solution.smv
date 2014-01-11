@@ -2,8 +2,6 @@ MODULE main
 	VAR 
 		pacman : agent(0,4,FALSE,gameover);
 		ghost : agent(2,2,TRUE,gameover);
---		countDown : 0..9;
-		lost : boolean;
 		
 --		      square(pacman, ghost,x, y,   u,     d,     l,      r)
 		sq1 : square(pacman, ghost,0, 1 ,FALSE ,TRUE ,TRUE ,FALSE );
@@ -16,43 +14,39 @@ MODULE main
  		sq8 : square(pacman, ghost,2, 3 ,TRUE ,FALSE ,FALSE ,TRUE );
  		sq9 : square(pacman, ghost,0, 4 ,TRUE ,FALSE ,TRUE ,FALSE );
  		sq10 : square(pacman, ghost,1,4 ,TRUE ,FALSE ,FALSE ,TRUE );
+ 		
+ 		gameState : {WIN,LOSE,playing};
+		gameover: boolean;
 
 	ASSIGN
---		init(countDown) := 9;
---		next(countDown) := case
---								0<countDown : countDown - 1;
---								TRUE : 0;
---							esac;
-		
---		Also lose when pacman and the ghost cross each other
-		init(lost) := FALSE;					
-		next(lost) := case
-		    (next(pacman.x) = next(ghost.x)) 
-		  	& (next(pacman.y) = next(ghost.y)) : TRUE;
-		  	(pacman.x+1 = ghost.x & pacman.y = ghost.y
-		  		& pacman.direction = right 
-		  		& ghost.direction = left) : TRUE;
-		  	(ghost.x+1 = pacman.x & pacman.y = ghost.y
-		  		& ghost.direction = right 
-		  		& pacman.direction = left) : TRUE;
-		  	(pacman.y+1 = ghost.y & pacman.x = ghost.x
-		  		& pacman.direction = up 
-		  		& ghost.direction = down) : TRUE;
-		  	(ghost.y+1 = pacman.y & pacman.x = ghost.x
-		  		& ghost.direction = up 
-		  		& pacman.direction = down) : TRUE;
-		  	TRUE : lost;
+		-- Also lose when pacman and the ghost cross each other
+		-- First check ik the player lost, if not, he can win
+		init(gameState) := playing;					
+		next(gameState) := case
+		    	(next(pacman.x) = next(ghost.x)) 
+		  		& (next(pacman.y) = next(ghost.y)) : LOSE;
+		  		(pacman.x+1 = ghost.x & pacman.y = ghost.y
+		  			& pacman.direction = right 
+		  			& ghost.direction = left) : LOSE;
+		  		(ghost.x+1 = pacman.x & pacman.y = ghost.y
+		  			& ghost.direction = right 
+		  			& pacman.direction = left) : LOSE;
+		  		(pacman.y+1 = ghost.y & pacman.x = ghost.x
+		  			& pacman.direction = up 
+		  			& ghost.direction = down) : LOSE;
+		  		(ghost.y+1 = pacman.y & pacman.x = ghost.x
+		  			& ghost.direction = up 
+		  			& pacman.direction = down) : LOSE;
+		  		!next(sq1.contains_coin) & !next(sq2.contains_coin) 
+				& !next(sq3.contains_coin) & !next(sq4.contains_coin) 
+				& !next(sq5.contains_coin) & !next(sq6.contains_coin) 
+				& !next(sq7.contains_coin) & !next(sq8.contains_coin)
+				& !next(sq9.contains_coin) & !next(sq10.contains_coin): WIN;
+		  		TRUE : gameState;
 			esac;
-				
-	DEFINE
---		lost := (pacman.x = ghost.x) & (pacman.y = ghost.y);
-		won := !lost
-				& !sq1.contains_coin & !sq2.contains_coin 
-				& !sq3.contains_coin & !sq4.contains_coin 
-				& !sq5.contains_coin & !sq6.contains_coin 
-				& !sq7.contains_coin & !sq8.contains_coin
-				& !sq9.contains_coin & !sq10.contains_coin;
-		gameover := won | lost;
+			
+		init(gameover) := gameState = WIN | gameState = LOSE;
+		next(gameover) := next(gameState) != playing;
 	
 	
 	--Pacman is altijd op een gedefinieerde square
@@ -60,29 +54,28 @@ MODULE main
 		sq6.pacmanHere | sq7.pacmanHere | sq8.pacmanHere | sq9.pacmanHere | sq10.pacmanHere)
 	
 	--Vanuit elke begintoestand kan het spel zowel gewonnen als verloren worden.
-	CTLSPEC !(AX lost) -> (EF won)
-	CTLSPEC (EF lost)
+	CTLSPEC !(AX gameState=LOSE) -> (EF gameState=WIN)
+	CTLSPEC (EF gameState=LOSE)
 	
 	--Muntjes kunnen niet terug verschijnen: als er ergens geen muntje ligt, dan zal in de toekomomst er nooit nog een muntje liggen.
 	--(check dit voor 1concreet vakje)
-	SPEC (!sq1.contains_coin -> AX !sq1.contains_coin)
+	CTLSPEC (!sq1.contains_coin -> AX !sq1.contains_coin)
 	
 	--Het is mogelijk dat pacman oneindig vaak op locatie (1;1) is terwijl het spel nog bezig is.
 	CTLSPEC EG (EF (pacman.x = 1 & pacman.y = 1))
 	
 	--Als pacman oneindig vaak op locatie (1;1) komt en oneindig vaak op locatie (1;3) komt, dan wordt het spel nooit gewonnen.
-	LTLSPEC G ((F (pacman.x = 1 & pacman.y = 1)) & (F (pacman.x = 1 & pacman.y = 3))) -> G !won
+	LTLSPEC G ((F (pacman.x = 1 & pacman.y = 1)) & (F (pacman.x = 1 & pacman.y = 3))) -> G gameState!=WIN
 	
 	--Eens het spel verloren of gewonnen is, blijft het spel in deze toestand.
---	CTLSPEC AG (won -> AX won)
-	LTLSPEC (X won -> won)
-	CTLSPEC AG (lost -> AX lost)
+--	CTLSPEC AG (gameState=WIN -> AX gameState=WIN)
+	LTLSPEC (X gameState=WIN -> gameState=WIN)
+	CTLSPEC AG (gameState=LOSE -> AX gameState=LOSE)
 	
 	--Er zijn minstens 10 tijdstappen nodig om het spel te winnen
-	CTLSPEC ! EX EX (EX EX EX (EX EX EX won))
---	LTLSPEC X X (X X X (X X X !won))
---	CTLSPEC AG ( won -> countDown = 0)
---	LTLSPEC G ( won -> countDown = 0)
+	--Kan niet winnen door vanaf het begin maar 8 keer te bewegen
+--	CTLSPEC ! EX EX (EX EX EX (EX EX EX gameState=WIN))
+	LTLSPEC X X (X X X (X X X gameState != WIN))
 	
 	
 	
