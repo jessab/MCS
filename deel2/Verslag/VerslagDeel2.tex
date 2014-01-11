@@ -29,17 +29,17 @@
 % control+shift+d	: uncomment
 
 \section{Inleiding}
-In dit verslag worden kort de ontwerpbeslissingen bij het uitwerken van het tweede deel van het project toegelicht.
-De opdracht was \dots
+In dit verslag worden kort de ontwerpbeslissingen bij het uitwerken van het tweede en derde deel van het project toegelicht.
+De opdracht van het tweede deel was de modellering van het pacman spel  in IDP met behulp van het LTC-formalisme en het uitvoeren van enkele verificaties daarop om de correctheid van de oplossing te testen.
+De opdracht van het derde deel was de modellering van het pacman spel in NuSMV en daar een aantal invarianten te bewijzen met behulp van LTL en CTL.
 Tot slot vermeldt de tekst ook de tijd die nodig was om dit te verwezenlijken.
 
 \section{IDP}
-\subsection{Verbetering iteratie 1}
-Ondanks de correcte werking van onze oplossing voor iteratie 1, waren enkele verbeteringen op vlak van complexiteit en performantie mogelijk. Voor de performantie werd de voorwaarde dat alle vakjes elkaar moeten bereiken versoepeld naar dat \'e\'en vakje alle andere moet kunnen bereiken, wat hetzelfde impliceert. Verder werd het predicaat \texttt{Edge(x1,y1,x2,y2,d)} toegevoegd dat verschillende voordelen geeft. Edge drukt de relatie uit tussen 2 aangrenzende vakjes op posities (x1,y1) en (x2,y2) waarvan vakje 2 in richting d ten opzichte van vakje 1 ligt. Dit wordt gebruikt om \texttt{Reach(x1,y1,x2,y2)} efficienter na te gaan door enkel naar buren te kijken en niet naar eender welk vakje. Het wordt ook gebruikt om mogelijke stappen te vinden (die niet door een muur, van het bord af of naar een NoPos gaan), wat gebruikt wordt als voorwaarde op \texttt{Move} en de 2 nieuwe regels: \texttt{DeadEnd} en \texttt{Crossed}. De implementatie wordt hierdoor minder complex.
+\subsection{Toestandsaxioma's}
+De meeste toestandsaxioma's konden overgenomen worden uit de oplossing voor iteratie 1 door een tijd variable toe te voegen. \texttt{PreviousMove} werd ook behouden (met tijdsvariabele), dit predicaat laat toe binnen \'e\ en toestand te redeneren. Enkele verbeteringen op valk van complexiteit en performantie waren mogelijk. Voor de performantie werd de voorwaarde dat alle vakjes elkaar moeten bereiken versoepeld naar dat \'e\'en vakje alle andere moet kunnen bereiken, wat hetzelfde impliceert. Verder werd het predicaat \texttt{Edge(x1,y1,x2,y2,d)} toegevoegd dat verschillende voordelen geeft. Edge drukt de relatie uit tussen 2 aangrenzende vakjes op posities (x1,y1) en (x2,y2) waarvan vakje 2 in richting d ten opzichte van vakje 1 ligt. Dit wordt gebruikt om \texttt{Reach(x1,y1,x2,y2)} efficienter na te gaan door enkel naar buren te kijken en niet naar eender welk vakje. Het wordt ook gebruikt om mogelijke stappen te vinden (die niet door een muur, van het bord af of naar een NoPos gaan), wat gebruikt wordt als voorwaarde op \texttt{Move} en de 2 nieuwe toestandsaxioma's: \texttt{DeadEnd} en \texttt{Crossed}. De implementatie wordt hierdoor minder complex.
 
-\subsection{GameWon en GameLost}
-\texttt{GameWon} en \texttt{GameLost} zijn niet als fluents geimplementeerd. De reden hiervoor is dat de natuurlijke wijze om regels over winnen/verliezen te verwoorden van het type zijn: ''De huidige staat is \dots, dus nu is het spel gewonnen/verloren''. Bijvoorbeeld: ''In de huidige staat zijn er geen muntstukken meer dus het spel is nu gewonnen.'' Gebruikmakende van een fluent zou de regel moeten verwoord worden als "In de huidige staat wordt een actie uitgevoerd waardoor het spel in de volgende staat gewonnen/verloren zal zijn'', dus: ''In de huidige staat is er nog maar 1 muntstuk, dat ligt op het vakje waar pacman op staat en pacman gaat een stap zetten dus het spel zal in de staat gewonnen zijn.'' Dit is duidelijk omslachtig. Er werd gekozen om de predicaten \texttt{GameWon} en \texttt{GameLost} eenduidig te defini\"eren op de staat. Om dit te kunnen doen heeft de staat de predicaten \texttt{PreviousMove}, \texttt{PrevLost} en \texttt{PrevWon} nodig. \texttt{PreviousMove}  is nodig om te bepalen 
-of pacman en een geest elkaar net gekruisd zijn, \texttt{PrevWon} en \texttt{PrevLost} worden gebruikt om op te dragen dat eenmaal een spel verloren/gewonnen is, dit niet meer veranderd.
+\subsection{Fluents}
+\texttt{GameWon} en \texttt{GameLost} zijn net zoals \texttt{Position} en \texttt{Gold} fluents. Inertie is duidelijk van toepassing op hun omdat hun waarde hetzelfde blijft tenzij die veranderd wordt door de toestand van het spel. \texttt{GameWon} en \texttt{GameLost} hebben onmiddelijke causaties. Dit komt doordat ze afhankelijk zijn van de toestand. Als er een winnende toestand is, dan is het spel dan gewonnen en niet pas in de volgende toestand.
 
 \subsection{Verificatie}
 De eerste twee verificaties zijn voorwaarden waar altijd, in alle mogelijke modellen, aan voldaan moet zijn. De manier om dit na te gaan is contradictie: de omgekeerde voorwaarde toevoegen. Als de theorie met deze bijkomende voorwaarde satisfieerbaar is, betekend dat dat aan de originele voorwaarde niet voldaan werd. Als er zo geen modellen bestaan dan is het wel correct.
@@ -48,6 +48,11 @@ De laatste twee verificaties stellen dat er een model moet bestaan waarin aan ee
 
 De eerste verificatie (het aantal muntstukken op het bord kan enkel omlaag gaan) gebeurt door de voorwaarde toe te voegen dat er op een tijdstip geen goud ligt op een vakje maar op een later tijdstip, op dat zelfde vakje, plots wel. Dit werd verkozen boven de letterlijke vertaling van de opgave omdat het strikter (muntstukken kunnen ook niet van vakje veranderen) en performanter is. Deze striktere voorwaarde impliceert wel dat het aantal muntstukken op het bord enkel omlaag kan gaan.
 
+In alle gegeven en enkele zelf geschreven test-structuren wordt er aan de verificaties gedaan op volgende voorwaarden:
+\begin{itemize}
+\item Er bestaan modellen voor de test-structuren, anders kan er nooit gewonnen of verloren worden.
+\item In een test-structuur waar elk altijd gewonnen of verloren wordt, faalt de verificatie dat het spel altijd verloren, respectievelijk gewonnen, moet kunnen worden.
+\end{itemize}
 
 
 \section{NuSMV}
@@ -113,9 +118,9 @@ Tot slot zijn er minstens $ 10 $ tijdstappen nodig als het spel in elke $ 9^{de}
 \section{Tijdsbesteding}
 \begin{tabular}{l l l}
 Jessa: 	& IDP 	& $ 10\,u $\\
-	& NuSMV & $ 2\,u $\\
+		& NuSMV 	& $ 2\,u $\\
 Karel: 	& IDP 	& $ 4\,u $\\
-	& NuSMV & $ 7,5\,u $\\
+		& NuSMV 	& $ 7,5\,u $\\
 \end{tabular}
 
 \section{Besluit}

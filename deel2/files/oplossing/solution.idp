@@ -29,29 +29,30 @@ vocabulary PacmanVoc{
         Cn_position(time, agent, xCo, yCo)
                 
         Gold(time, xCo, yCo)
-        I_gold(xCo, yCo)                                //Initial gold location
-        //C_gold(time, xCo, yCo)	//niet nodig want goud kan niet ontstaan
+        I_gold(xCo, yCo)                            //Initial gold location
+        //C_gold(time, xCo, yCo)					//niet nodig want goud kan niet ontstaan
         Cn_gold(time, xCo, yCo)
         
-        PreviousMove(time,agent,dir)
+        GameLost(time)
+        C_gameLost(time)
+        GameWon(time)
+        C_gameWon(time)
+        
         
         // action
         Move(time, agent, dir)
         
         // invariable
-        NoPos(xCo,yCo)
         Pos(xCo,yCo)
         Wall(xCo,yCo,dir)
+        
+        // syntactic sugar
+        PreviousMove(time,agent,dir)
         OppositeDir(dir):dir
         Transition(dir,xCo,yCo,xCo,yCo)
         Edge(xCo,yCo,xCo,yCo,dir)
         Reach(xCo,yCo,xCo,yCo)
-
-        // game winning
-        GameLost(time)
-        GameWon(time)
-        PrevLost(time)
-        PrevWon(time)
+        NoPos(xCo,yCo)
         GameEnded(time)
         DeadEnd(time)
         Crossed(time)
@@ -69,7 +70,9 @@ theory TimeTheory:PacmanVoc{
 
 theory PacmanTheory:PacmanVoc{
 	
-	// Invariabele definities (syntactic sugar)
+	//////////////////////////////////
+	// DEFINITIES (syntactic sugar) //
+	//////////////////////////////////
 	
         // OppositeDirection, uitdrukken dat twee richtingen elkaars tegengestelden zijn
         OppositeDir(Left)=Right.
@@ -96,9 +99,36 @@ theory PacmanTheory:PacmanVoc{
                 		& ~Wall(x1,y1,d)
                 		& ~Wall(x2,y2,OppositeDir(d)).
         }
+        
+        
+        // pacman is gepakt door een geest
+        !t[time]:Caught(t)<=>? x[xCo],y[yCo], a[agent]: Position(t,pacman,x,y) & Position(t,a,x,y) & ~a=pacman.
+        
+        // kruisen van spook en pacman
+    	!t[time] : Crossed(t) <=> ?a[agent] x1[xCo] y1[yCo] x2[xCo] y2[yCo] d[dir]: 
+    		~a=pacman //pacman en spook
+			& Position(t,pacman,x1,y1) & Position(t,a,x2,y2) //staan op bepaalde positities op tijdstip t
+			& Edge(x1,y1,x2,y2,d) //De posities liggen naast elkaar volgens richting d
+    		& PreviousMove(t,pacman,OppositeDir(d)) & PreviousMove(t,a,d). // verwisselen van positie in volgend tijdstip
+        
+                
+		// Doodlopende Gangen
+		!t[time] : DeadEnd(t) <=> ?a[agent] x[xCo] y[yCo]:
+        	~a=pacman & Position(t,a,x,y)	//het is een geest op positie (x,y)
+        	& #{d[dir],x1[xCo],y1[yCo]:Edge(x,y,x1,y1,d)}=1. //Er is maar 1 toegang tot die positie 
+                
+        // GameEnded: Het spel is gedaan, het is verloren of gewonnen
+        !t[time]:GameEnded(t)<=>GameLost(t)|GameWon(t).
+        
+        {	// PreviousMove
+        	!a[agent] d[dir] t[time]: PreviousMove(Next(t),a,d) <- Move(t,a,d).
+        }
+        
+        
 
-
-	// Invariabele precondities
+	//////////////////////////////
+	// INVARIABELE PRECONDITIES //
+	//////////////////////////////
 	
         // Alle vakjes zijn aaneengesloten
                 //Reach: 2 vakjes kunnen elkaar bereiken via aaneenliggende vakjes die deel 
@@ -113,7 +143,9 @@ theory PacmanTheory:PacmanVoc{
         ?x1[xCo],y1[yCo]: Pos(x1,y1) & (!x2[xCo],y2[yCo]:Pos(x2,y2)=>Reach(x1,y1,x2,y2)).
         
         
-     // Precondities (tijdshebbende)
+     ///////////////////  
+     // PRECONDITIES  //
+     ///////////////////
      
         // Iedereen is op exact 1 plaats
         !t[time],a[agent]:#{x[xCo] y[yCo] : Position(t,a,x,y)}=1.
@@ -133,61 +165,17 @@ theory PacmanTheory:PacmanVoc{
         
         // Ghosts kunnen niet omkeren
         ! t[time],a[agent],d [dir], prevD[dir] : a=pacman | ( Move(t,a,d) & PreviousMove(t,a,prevD)=>~prevD=OppositeDir(d)).
- 
- 
- 		///////////////////////////
- 		/// WIN/LOSE CONDITIONS ///
- 		///////////////////////////
-
-        // GAMELOST als een ghost op hetzelfde vakje als pacman staat of ghost en pacman elkaar gekruisd zijn
-        !t[time]:Caught(t) //pacman en ghost op zelfde positie
-        	| Crossed(t) // of ze zijn elkaar gekruisd
-        	| PrevLost(t) // of het spel was al verloren
-        	<=> GameLost(t). // dus het spel is verloren
-        
-        // pacman is gepakt door een geest
-        !t[time]:Caught(t)<=>? x[xCo],y[yCo], a[agent]: Position(t,pacman,x,y) & Position(t,a,x,y) & ~a=pacman.
-        
-        // kruisen van spook en pacman
-    	!t[time] : Crossed(t) <=> ?a[agent] x1[xCo] y1[yCo] x2[xCo] y2[yCo] d[dir]: 
-    		~a=pacman //pacman en spook
-			& Position(t,pacman,x1,y1) & Position(t,a,x2,y2) //staan op bepaalde positities op tijdstip t
-			& Edge(x1,y1,x2,y2,d) //De posities liggen naast elkaar volgens richting d
-    		& PreviousMove(t,pacman,OppositeDir(d)) & PreviousMove(t,a,d). // verwisselen van positie in volgend tijdstip
-        
-        
-        // GAMEWON als al het goud op is of een spook in een doodlopende gang zit en het spel niet verloren is
-        !t[time]:(~GameLost(t)  // het spel is niet verloren
-        	& (~ (? x[xCo],y[yCo] : Gold(t,x,y))  // er is geen goud meer
-        		| DeadEnd(t))  // er zit een spook in een doodlopende gang
-        	| PrevWon(t) // het spel was al gewonnnen
-        ) <=> GameWon(t). //Als aan de voorwaarden voor gameLost en gameWon voldaan is, dan is het ook verloren
-                
-        // Doodlopende Gangen
-//        !t[time] : DeadEnd(t) <=> ?a[agent] x[xCo] y[yCo] d[dir]:
-//        	~a=pacman & Position(t,a,x,y)	//het is een geest op positie (x,y)
-//        	& PreviousMove(t,a,d) //die net een stap in richting d gedaan heeft
-//        	& ~(?d1[dir] x1[xCo] y1[yCo]: //Het volgende geval komt niet voor:
-//        		~d1=OppositeDir(d)		//er is een richting die niet de terugkeer richting is
-//        		& Edge(x,y,x1,y1,d1)	//en er in die richting een direct bereikbaar vakje ligt
-//        	).
-        !t[time] : DeadEnd(t) <=> ?a[agent] x[xCo] y[yCo]:
-        	~a=pacman & Position(t,a,x,y)	//het is een geest op positie (x,y)
-        	& #{d[dir],x1[xCo],y1[yCo]:Edge(x,y,x1,y1,d)}=1. //Er is maar 1 toegang tot die positie 
-                
-        // GameEnded: Het spel is gedaan, het is verloren of gewonnen
-        !t[time]:GameEnded(t)<=>GameLost(t)|GameWon(t).
-        
-        
-        
+ 		
         // Afhankelijk van of het spel al gedaan is moet iedereen bewegen/mag niemand bewegen
         !t[time]:GameEnded(t)<=>~?a[agent],d[dir]:Move(t,a,d).
         !t[time]:~GameEnded(t)<=>!a[agent]:?d[dir]:Move(t,a,d).
         
+        
 
-        
-        
-        // Successor State Action Axiom & Inertia
+        ////////////////////////////////////////////
+        // SUCCESSOR STATE ACTION AXION & INERTIA //
+        ////////////////////////////////////////////
+
         {	//Position
 			!a[agent] x[xCo] y[yCo]: Position(Start,a,x,y) <- I_position(a,x,y).
 			!a[agent] x[xCo] y[yCo] t[time]: Position(Next(t),a,x,y) <- C_position(t,a,x,y).
@@ -197,23 +185,34 @@ theory PacmanTheory:PacmanVoc{
 			!x[xCo] y[yCo] : Gold(Start,x,y) <- I_gold(x,y).
 			!x[xCo] y[yCo] t[time] : Gold(Next(t),x,y) <- Gold(t,x,y) & ~Cn_gold(t,x,y).
         }
-        {
-        	!a[agent] d[dir] t[time]: PreviousMove(Next(t),a,d) <- Move(t,a,d).
+			
+        {	// GameLost
+        	!t[time]: GameLost(t) <- C_gameLost(t).
+        	!t[time]: GameLost(Next(t)) <- GameLost(t).
+        }	
+        {	// GameWon
+        	!t[time]: GameWon(t) <- C_gameWon(t).
+        	!t[time]: GameWon(Next(t)) <- GameWon(t).
         }
-        {
-        	!t[time]: PrevLost(Next(t)) <- GameLost(t). //C_prevLost weggelaten vanwege zo simpel dat het overbodig is
-        }
-        {
-        	!t[time]: PrevWon(Next(t)) <- GameWon(t). //C_prevWon weggelaten vanwege zo simpel dat het overbodig is
-        }
+        
 
-		// Causes
+		////////////
+		// CAUSES //
+		////////////
+		
         {   // Position     
         	!a[agent] x[xCo] y[yCo] t[time] : C_position(t,a,x,y) <- ? x1[xCo] y1[yCo] d[dir]: Position(t,a,x1,y1) & Move(t,a,d) & Edge(x1,y1,x,y,d).
         	!a[agent] x[xCo] y[yCo] t[time] : Cn_position(t,a,x,y) <- ?d[dir]: Position(t,a,x,y) & Move(t,a,d).
         }
         {	// Gold
         	!x[xCo] y[yCo] t[time] : Cn_gold(t,x,y) <- Position(t,pacman,x,y) & ?d[dir]:Move(t,pacman,d).
+        }
+        {	// WIN & LOSE
+        	!t[time] : C_gameWon(t) <- ~C_gameLost(t)  // het spel is niet verloren
+        								& (~ (? x[xCo],y[yCo] : Gold(t,x,y))  // en er is geen goud meer
+        								| DeadEnd(t)).  // of er zit een spook in een doodlopende gang
+			!t[time] : C_gameLost(t) <- Caught(t) //pacman en ghost op zelfde positie
+        								| Crossed(t). // of ze zijn elkaar gekruisd		
         }
                 
 }
@@ -222,12 +221,7 @@ theory verification1: PacmanVoc{
         // Te verifieren: Het aantal muntstukken op het bord kan enkel omlaag gaan
         // Contradictie: Voorwaarde toevoegen dat er een tijd bestaat waar het aantal muntstukken omhoog gaat
         
-
-//        ?t[time] x[xCo] y[yCo]: ~Gold(t,x,y) & Gold(Next(t),x,y).        
-//        ?t[time] : #{x[xCo],y[yCo]:Gold(t,x,y)} < #{x[xCo],y[yCo]:Gold(Next(t),x,y)}.
-
         ?t1[time] t2[time] x[xCo] y[yCo]: t2 = Next(t1) & ~Gold(t1,x,y) & Gold(t2,x,y).        
-//        ?t1[time] t2[time] : t2=Next(t1) & #{x[xCo],y[yCo]:Gold(t1,x,y)} < #{x[xCo],y[yCo]:Gold(t2,x,y)}.
 
 }
 
@@ -256,7 +250,7 @@ procedure verification2proc(struc){
         TT = merge(T,verification2)
 
 		if sat(TT, struc) then
-			print("nok: Als het spel ten einde is, blijft dat niet per s� zo")
+			print("nok: Als het spel ten einde is, blijft dat niet per se zo")
 			printmodels(models)
 		else
 			print("ok: als het spel ten einde is, blijft het ten einde")
@@ -308,6 +302,10 @@ procedure allVerifications(){
         verification4proc(strucToCheck)
 
 }
+
+//procedure main(){
+//	allVerifications()
+//}
 
 structure verStruc: PacmanVoc{
         

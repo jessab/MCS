@@ -1,13 +1,14 @@
 \BOOKMARK [1][-]{section.1}{Inleiding}{}% 1
 \BOOKMARK [1][-]{section.2}{IDP}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Verbetering iteratie 1}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{GameWon en GameLost}{section.2}% 4
-\BOOKMARK [2][-]{subsection.2.3}{Verificatie}{section.2}% 5
-\BOOKMARK [1][-]{section.3}{NuSMV}{}% 6
-\BOOKMARK [2][-]{subsection.3.1}{Modellering}{section.3}% 7
-\BOOKMARK [3][-]{subsubsection.3.1.1}{Direction en bewegen}{subsection.3.1}% 8
-\BOOKMARK [3][-]{subsubsection.3.1.2}{Coins}{subsection.3.1}% 9
-\BOOKMARK [3][-]{subsubsection.3.1.3}{GameState}{subsection.3.1}% 10
-\BOOKMARK [2][-]{subsection.3.2}{Verificatie}{section.3}% 11
-\BOOKMARK [1][-]{section.4}{Tijdsbesteding}{}% 12
-\BOOKMARK [1][-]{section.5}{Besluit}{}% 13
+\BOOKMARK [2][-]{subsection.2.1}{State axioma's}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Fluents}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{GameWon en GameLost}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Verificatie}{section.2}% 6
+\BOOKMARK [1][-]{section.3}{NuSMV}{}% 7
+\BOOKMARK [2][-]{subsection.3.1}{Modellering}{section.3}% 8
+\BOOKMARK [3][-]{subsubsection.3.1.1}{Direction en bewegen}{subsection.3.1}% 9
+\BOOKMARK [3][-]{subsubsection.3.1.2}{Coins}{subsection.3.1}% 10
+\BOOKMARK [3][-]{subsubsection.3.1.3}{GameState}{subsection.3.1}% 11
+\BOOKMARK [2][-]{subsection.3.2}{Verificatie}{section.3}% 12
+\BOOKMARK [1][-]{section.4}{Tijdsbesteding}{}% 13
+\BOOKMARK [1][-]{section.5}{Besluit}{}% 14
