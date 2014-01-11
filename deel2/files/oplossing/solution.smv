@@ -20,7 +20,7 @@ MODULE main
 
 	ASSIGN
 		-- Also lose when pacman and the ghost cross each other
-		-- First check ik the player lost, if not, he can win
+		-- First check if the player lost, if not, he can win
 		init(gameState) := playing;					
 		next(gameState) := case
 		    	(next(pacman.x) = next(ghost.x)) 
@@ -57,7 +57,7 @@ MODULE main
 	CTLSPEC !(AX gameState=LOSE) -> (EF gameState=WIN)
 	CTLSPEC (EF gameState=LOSE)
 	
-	--Muntjes kunnen niet terug verschijnen: als er ergens geen muntje ligt, dan zal in de toekomomst er nooit nog een muntje liggen.
+	--Muntjes kunnen niet terug verschijnen: als er ergens geen muntje ligt, dan zal in de toekomst er nooit nog een muntje liggen.
 	--(check dit voor 1concreet vakje)
 	CTLSPEC (!sq1.contains_coin -> AX !sq1.contains_coin)
 	
