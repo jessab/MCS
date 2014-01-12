@@ -23,6 +23,7 @@ MODULE main
 		-- First check ik the player lost, if not, he can win
 		init(gameState) := playing;					
 		next(gameState) := case
+				gameState = LOSE : LOSE;
 		    	(next(pacman.x) = next(ghost.x)) 
 		  		& (next(pacman.y) = next(ghost.y)) : LOSE;
 		  		(pacman.x+1 = ghost.x & pacman.y = ghost.y
@@ -62,7 +63,7 @@ MODULE main
 	CTLSPEC AG (!sq1.contains_coin -> AX !sq1.contains_coin)
 	
 	--Het is mogelijk dat pacman oneindig vaak op locatie (1;1) is terwijl het spel nog bezig is.
-	CTLSPEC EG (EF (pacman.x = 1 & pacman.y = 1 & gameState=playing))
+	CTLSPEC EG ((EX gameState=playing) -> EF (pacman.x = 1 & pacman.y = 1))
 	
 	--Als pacman oneindig vaak op locatie (1;1) komt en oneindig vaak op locatie (1;3) komt, dan wordt het spel nooit gewonnen.
 	LTLSPEC G ((F (pacman.x = 1 & pacman.y = 1)) & (F (pacman.x = 1 & pacman.y = 3))) -> G gameState!=WIN
