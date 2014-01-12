@@ -39,7 +39,7 @@ Tot slot vermeldt de tekst ook de tijd die nodig was om dit te verwezenlijken.
 
 \section{IDP}
 \subsection{Toestandsaxioma's}
-De meeste toestandsaxioma's konden overgenomen worden uit de oplossing voor iteratie 1 door een tijd variable toe te voegen. \texttt{PreviousMove} werd ook behouden (met tijdsvariabele), dit predicaat laat toe binnen \'e\'en toestand te redeneren. Enkele verbeteringen op valk van complexiteit en performantie waren mogelijk. Voor de performantie werd de voorwaarde dat alle vakjes elkaar moeten bereiken versoepeld naar dat \'e\'en vakje alle andere moet kunnen bereiken, wat hetzelfde impliceert. Verder werd het predicaat \texttt{Edge(x1,y1,x2,y2,d)} toegevoegd dat verschillende voordelen geeft. Edge drukt de relatie uit tussen 2 aangrenzende vakjes op posities (x1,y1) en (x2,y2) waarvan vakje 2 in richting d ten opzichte van vakje 1 ligt. Als vakjes een gemeenschappelijke \texttt{Edge} hebben, betekent het dat er geen muur tussen staat en dat ze beide posities zijn.Dit wordt gebruikt om \texttt{Reach(x1,y1,x2,y2)} efficienter na te gaan door enkel naar buren te kijken en niet naar eender welk vakje. Het wordt ook gebruikt om mogelijke stappen te vinden (die niet door een muur, van het bord af of naar een NoPos gaan), wat gebruikt wordt als voorwaarde op \texttt{Move} en de 2 nieuwe toestandsaxioma's: \texttt{DeadEnd} en \texttt{Crossed}. De implementatie wordt hierdoor minder complex.
+De meeste toestandsaxioma's konden overgenomen worden uit de oplossing voor iteratie 1 door een tijd variable toe te voegen. \texttt{PreviousMove} werd ook behouden (met tijdsvariabele), dit predicaat laat toe binnen \'e\'en toestand te redeneren. Enkele verbeteringen op vlak van complexiteit en performantie waren mogelijk. Voor de performantie werd de voorwaarde dat alle vakjes elkaar moeten bereiken versoepeld naar dat \'e\'en vakje alle andere moet kunnen bereiken, wat hetzelfde impliceert. Verder werd het predicaat \texttt{Edge(x1,y1,x2,y2,d)} toegevoegd dat verschillende voordelen geeft. Edge drukt de relatie uit tussen 2 aangrenzende vakjes op posities (x1,y1) en (x2,y2) waarvan vakje 2 in richting d ten opzichte van vakje 1 ligt. Als vakjes een gemeenschappelijke \texttt{Edge} hebben, betekent het dat er geen muur tussen staat en dat ze beide posities zijn. Dit wordt gebruikt om \texttt{Reach(x1,y1,x2,y2)} effici\"enter na te gaan door enkel naar buren te kijken en niet naar eender welk vakje. Het wordt ook gebruikt om mogelijke stappen te vinden (die niet door een muur, van het bord af of naar een NoPos gaan), wat gebruikt wordt als voorwaarde op \texttt{Move} en de 2 nieuwe toestandsaxioma's: \texttt{DeadEnd} en \texttt{Crossed}. De implementatie wordt hierdoor minder complex.
 
 \subsection{Fluents}
 \texttt{GameWon} en \texttt{GameLost} zijn net zoals \texttt{Position} en \texttt{Gold} fluents. Inertie is duidelijk van toepassing op hun omdat hun waarde hetzelfde blijft tenzij die verandert door de toestand van het spel. \texttt{GameWon} en \texttt{GameLost} hebben onmiddelijke causaties. Dit komt doordat ze afhankelijk zijn van de toestand. Als er een winnende toestand is, dan is het spel dan gewonnen en niet pas in de volgende toestand.
@@ -121,7 +121,7 @@ Tot slot zijn er minstens $ 10 $ tijdstappen nodig als het spel in elke $ 9^{de}
 \section{Tijdsbesteding}
 \begin{tabular}{l l l}
 Jessa: 	& IDP 	& $ 10\,u $\\
-		& NuSMV 	& $ 2\,u $\\
+		& NuSMV 	& $ 3,5\,u $\\
 Karel: 	& IDP 	& $ 4\,u $\\
 		& NuSMV 	& $ 7,5\,u $\\
 \end{tabular}
