@@ -23,6 +23,7 @@ MODULE main
 		-- First check if the player lost, if not, he can win
 		init(gameState) := playing;					
 		next(gameState) := case
+				gameState = LOSE : LOSE;
 		    	(next(pacman.x) = next(ghost.x)) 
 		  		& (next(pacman.y) = next(ghost.y)) : LOSE;
 		  		(pacman.x+1 = ghost.x & pacman.y = ghost.y
@@ -59,17 +60,17 @@ MODULE main
 	
 	--Muntjes kunnen niet terug verschijnen: als er ergens geen muntje ligt, dan zal in de toekomst er nooit nog een muntje liggen.
 	--(check dit voor 1concreet vakje)
-	CTLSPEC (!sq1.contains_coin -> AX !sq1.contains_coin)
+	CTLSPEC AG (!sq1.contains_coin -> AX !sq1.contains_coin)
 	
 	--Het is mogelijk dat pacman oneindig vaak op locatie (1;1) is terwijl het spel nog bezig is.
-	CTLSPEC EG (EF (pacman.x = 1 & pacman.y = 1))
+	CTLSPEC EG ((EX gameState=playing) -> EF (pacman.x = 1 & pacman.y = 1))
 	
 	--Als pacman oneindig vaak op locatie (1;1) komt en oneindig vaak op locatie (1;3) komt, dan wordt het spel nooit gewonnen.
 	LTLSPEC G ((F (pacman.x = 1 & pacman.y = 1)) & (F (pacman.x = 1 & pacman.y = 3))) -> G gameState!=WIN
 	
 	--Eens het spel verloren of gewonnen is, blijft het spel in deze toestand.
 --	CTLSPEC AG (gameState=WIN -> AX gameState=WIN)
-	LTLSPEC (X gameState=WIN -> gameState=WIN)
+	LTLSPEC (gameState=WIN -> X gameState=WIN)
 	CTLSPEC AG (gameState=LOSE -> AX gameState=LOSE)
 	
 	--Er zijn minstens 10 tijdstappen nodig om het spel te winnen
@@ -108,7 +109,8 @@ MODULE agent(startX,startY,isGhost,gameover)
 				direction = down & 0 < y: (y - 1);
 				TRUE: y;
 			esac;
-			
+		
+		-- ghost can't turn around	
 		next(direction):=
 			case
 				isGhost & direction = up : {up, left, right};
