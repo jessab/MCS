@@ -116,14 +116,14 @@ Omdat vakjes steeds zeer algemeen beschreven werden, is dit voldoende om hetzelf
 
 Na gaan dat er een uitvoering bestaat waarin pacman oneindig vaak op een specifiek vakje komt,
 is een moeilijke kwestie.
-Het is niet altijd zo dat hij meerdere keren op dat vakje komt dus zijn $ LTL $ formules niet bruikbaar.
-Daarnaast bezit $ CTL $ niet de expressiviteit om uitspraken te doen over toekomstige toestanden 
+Het is niet altijd zo dat hij meerdere keren op dat vakje komt dus zijn LTL formules niet bruikbaar.
+Daarnaast bezit CTL niet de expressiviteit om uitspraken te doen over toekomstige toestanden 
 binnen een zelfde uitvoeringspad.
 
 Bekijk ter illustratie figuur \ref{fig:loops}. 
 Stel dat dit een deel vormt van een groter transitiesysteem,
 en dat men wil verifi\"eren dat er een pad bestaat waarin $ \neg p $ oneindig vaak voorkomt.
-Het lijkt aannemelijk dat dit in $ CTL $ wordt $ EG\;EF\; \neg p $,
+Het lijkt aannemelijk dat dit in CTl wordt $ EG\;EF\; \neg p $,
 maar neem nu het pad die eeuwig in de eerste lus blijft hangen.
 In elke toestand bestaat er een pad waarin $ p $ ooit vals wordt.
 Dit gebeurt echter nooit in het gevonden pad.
@@ -134,29 +134,27 @@ Het is wel mogelijk, en dit wordt ook in de implementatie gedaan,
 om op te leggen dat pacman steeds naar dat vakje kan gaan.
 
 Om uitspraken te doen over een bepaald uitvoeringspad is een $ CTL^{*} $ formule nodig, namelijk
-\newline
-$ E \; (\,X\;gameState = playing\; ->\; F (\,pacman.x = 1\;\&\; pacman.y = 1\,)\,) $
+
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[width=0.6\columnwidth]{loops.png}
+\includegraphics[width=0.65\columnwidth]{loops.png}
 \end{center}
-\caption{Een onderdeel van een algemeen transitiesysteem. 
-De formule $ EG\;EF\; \neg p $ slaagt door de eerste lus.}%
+\caption{}%
 \label{fig:loops}%
 \end{figure}
 
-Met $ LTL $ kan men wel nagaan dat als pacman oneindig vaak op twee specifieke vakjes komt,
-hij nooit zal winnen.
+Op een gelijkaardige manier impliceren oneindig veel bezoeken aan twee verschillende vakjes,
+dat het spel in elke toestand niet gewonnen is.
 
 Tot slot zijn er minstens $ 10 $ tijdstappen nodig als het spel in elke $ 9^{de} $ toestand nog niet gewonnen is.
 
 \section{Tijdsbesteding}
 \begin{tabular}{l l l}
 Jessa: 	& IDP 	& $ 10\,u $\\
-		& NuSMV 	& $ 4,5\,u $\\
+		& NuSMV 	& $ 3,5\,u $\\
 Karel: 	& IDP 	& $ 4\,u $\\
-		& NuSMV 	& $ 9\,u $\\
+		& NuSMV 	& $ 7,5\,u $\\
 \end{tabular}
 
 %\section{Besluit}

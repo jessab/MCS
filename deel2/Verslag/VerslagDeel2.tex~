@@ -154,9 +154,9 @@ Tot slot zijn er minstens $ 10 $ tijdstappen nodig als het spel in elke $ 9^{de}
 \section{Tijdsbesteding}
 \begin{tabular}{l l l}
 Jessa: 	& IDP 	& $ 10\,u $\\
-		& NuSMV 	& $ 4,5\,u $\\
+		& NuSMV 	& $ 3,5\,u $\\
 Karel: 	& IDP 	& $ 4\,u $\\
-		& NuSMV 	& $ 9\,u $\\
+		& NuSMV 	& $ 7,5\,u $\\
 \end{tabular}
 
 %\section{Besluit}

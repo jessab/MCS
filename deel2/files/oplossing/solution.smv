@@ -21,6 +21,8 @@ MODULE main
 	ASSIGN
 		-- Also lose when pacman and the ghost cross each other
 		-- First check if the player lost, if not, he can win
+		-- Need to force LOSE to stay LOSE since crossing and winning
+		-- at the same time would otherwise only cause pacman to lose for one turn
 		init(gameState) := playing;					
 		next(gameState) := case
 				gameState = LOSE : LOSE;
@@ -86,8 +88,8 @@ MODULE main
 -- and it knows whether the game is over (boolean gameover)
 MODULE agent(startX,startY,isGhost,gameover)
 	VAR
-		x : 0..4;
-		y : 0..4;
+		x : 0..10;
+		y : 0..10;
 		direction : {up, down, left, right};
 	
 	ASSIGN
