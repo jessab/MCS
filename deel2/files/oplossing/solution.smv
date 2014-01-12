@@ -63,14 +63,14 @@ MODULE main
 	CTLSPEC AG (!sq1.contains_coin -> AX !sq1.contains_coin)
 	
 	--Het is mogelijk dat pacman oneindig vaak op locatie (1;1) is terwijl het spel nog bezig is.
-	CTLSPEC EG ((EX gameState=playing) -> EF (pacman.x = 1 & pacman.y = 1))
+	CTLSPEC EG ((EX gameState=playing) -> EF (EG (pacman.x = 1 & pacman.y = 1)))
 	
 	--Als pacman oneindig vaak op locatie (1;1) komt en oneindig vaak op locatie (1;3) komt, dan wordt het spel nooit gewonnen.
 	LTLSPEC G ((F (pacman.x = 1 & pacman.y = 1)) & (F (pacman.x = 1 & pacman.y = 3))) -> G gameState!=WIN
 	
 	--Eens het spel verloren of gewonnen is, blijft het spel in deze toestand.
 --	CTLSPEC AG (gameState=WIN -> AX gameState=WIN)
-	LTLSPEC (gameState=WIN -> X gameState=WIN)
+	LTLSPEC G(gameState=WIN -> X gameState=WIN)
 	CTLSPEC AG (gameState=LOSE -> AX gameState=LOSE)
 	
 	--Er zijn minstens 10 tijdstappen nodig om het spel te winnen
